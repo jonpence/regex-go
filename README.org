@@ -1,0 +1,9 @@
+#+TITLE: go-regex
+
+A regular expressions parser written in Go.
+
+* Checklist
+- [X] Implement deterministic finite automata using adjacency matrix.
+- [ ] Implement epsilon-transition nondeterministic finite automation to DFA conversion.
+- [ ] Implement regular expression to epsilon-NFA conversion.
+- [ ] Implement regex to DFA conversion.
