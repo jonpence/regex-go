@@ -13,18 +13,25 @@ A regular expressions engine written in Go.
 The following LL(1) grammar will be used to recursively parse regular expression statements:
 
 #+BEGIN_SRC
-S → A B
-B → '|' A B
-B → ε
-A → r C
-C → '*' C
+S → B C
+C → “|” B C
 C → ε
-D → symbol
-D → '(' S ')'
+B → D E
+E → “.” D E
+E → ε
+D → E F
+F → “*” F
+F → ε
+E → letter
+E → “ε”
+E → “(” S “)”
 #+END_SRC
 
 ** NFA Construction
-- TBD
+- Construction of the non-deterministic finite automaton occurs recursively during the parse.
+- Whenever a BAR, DOT, or STAR operator token is accepted, the parser combines the recursively constructed automaton substructures with the appropriate operation.
+- See graph.go for NFA implementation.
+- See parser.go for implementation.
 
 ** NFA to DFA Conversion
 - TBD
