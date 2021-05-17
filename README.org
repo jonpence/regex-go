@@ -1,9 +1,30 @@
 #+TITLE: go-regex
 
-A regular expressions parser written in Go.
+A regular expressions engine written in Go.
 
-* Checklist
-- [X] Implement deterministic finite automata using adjacency matrix.
-- [ ] Implement epsilon-transition nondeterministic finite automation to DFA conversion.
-- [ ] Implement regular expression to epsilon-NFA conversion.
-- [ ] Implement regex to DFA conversion.
+** Algorithm
+1. Accept a regular expression statement as input.
+2. Parse the statement into a parse tree.
+3. Construct a non-deterministic finite automaton from the parse tree.
+4. Make the finite automaton deterministic.
+5. Validate input strings.
+
+** Grammar
+The following LL(1) grammar will be used to recursively parse regular expression statements:
+
+#+BEGIN_SRC
+S → A B
+B → '|' A B
+B → ε
+A → r C
+C → '*' C
+C → ε
+D → symbol
+D → '(' S ')'
+#+END_SRC
+
+** NFA Construction
+- TBD
+
+** NFA to DFA Conversion
+- TBD

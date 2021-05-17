@@ -3,7 +3,7 @@ package fsm
 import (
 	"testing"
 	"reflect"
-	fsm "../src/fsm"
+	fsm "github.com/jonpence/regex-go/src/fsm"
 )
 
 // Gonna use this FSM to test throughout the test functions
