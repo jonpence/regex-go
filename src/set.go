@@ -12,6 +12,10 @@ type Set map[string]bool
 
 /* METHODS */
 //  -- initSet() -> Set
+//  -- initSetElements([]string) -> Set
+//  -- Set.size() -> int
+//  -- intToString(int) -> string
+//  -- initSetRange(int, int) -> Set
 //  -- Set.isMember(string) -> bool
 //  -- *Set.add(string)
 //  -- *Set.remove(string) -> bool
@@ -42,6 +46,58 @@ type Set map[string]bool
  */
 func initSet() Set {
 	return Set(make(map[string]bool))
+}
+
+/* initSetElements([]string) -> Set
+/*
+/* Instantiates a new map[string]bool and initializes its elements with */
+/* the string slice parameter. Then returns it cast to a Set.
+ */
+func initSetElements(elements []string) Set {
+	newSet := initSet()
+
+	for _, element := range elements {
+		newSet.add(element)
+	}
+
+	return newSet
+}
+
+/* Set.size() -> int
+/*
+/* Returns the number of elements in the set.
+ */
+func (s Set) size() int {
+	return len(s)
+}
+
+/* intToString(int) -> string
+/*
+/* Returns a string encoding of the int parameter.
+ */
+func intToString(n int) string {
+	buf := ""
+
+	for ; n > 0; n /= 10 {
+		buf = string((n % 10) + 48) + buf
+	}
+
+	return buf
+}
+
+/* initSetRange(int, int) -> Set
+/*
+/* Instantiates a new set and fills it with elements ranging from low to high
+/* exclusive. Then returns the new set.
+ */
+func initSetRange(lower int, upper int) Set {
+	newSet := initSet()
+
+	for ; lower < upper; lower++ {
+		newSet.add(intToString(lower))
+	}
+
+	return newSet
 }
 
 /* Set.isMember(string) -> bool
@@ -294,7 +350,7 @@ func (s Set) toString() string {
 	first := true
 
 	for element := range s {
-		if s[element] {
+		if s.isMember(element) {
 			if !first {
 				buf = buf + fmt.Sprintf(", %s", element)
 			} else {
