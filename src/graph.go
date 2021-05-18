@@ -10,18 +10,20 @@ type Node struct {
 }
 
 type Graph struct {
-	nodes   map[int]*Node
-	count   int
-	start   *Node
-	current *Node
+	nodes    map[int]*Node
+	count    int
+	start    *Node
+	terminal *Node
+	current  *Node
+	inputs   Set
 }
 
 func (n *Node) addNeighbor(symbol string, dest *Node) {
 	n.neighbors[symbol] = append(n.neighbors[symbol], dest)
 }
 
-func (g *Graph) addEdge(src int, dest int, symbol string) {
-	g.nodes[src].addNeighbor(symbol, g.nodes[dest])
+func (n Node) transitionOn(input string) []*Node {
+	return n.neighbors[input]
 }
 
 func (n Node) printNode() {
@@ -45,6 +47,10 @@ func (n Node) printNode() {
 	}
 }
 
+func initGraph() Graph {
+	return Graph{make(map[int]*Node), 0, nil, nil, nil, initSet()}
+}
+
 func (g *Graph) addNode() int {
 	g.count += 1
 	n := Node{g.count, make(map[string][]*Node)}
@@ -53,9 +59,30 @@ func (g *Graph) addNode() int {
 	return n.id
 }
 
+func (g *Graph) addEdge(src int, dest int, symbol string) {
+	g.nodes[src].addNeighbor(symbol, g.nodes[dest])
+	if symbol != "" {
+		g.inputs.add(symbol)
+	}
+}
+
 func (g *Graph) setStart(id int) {
 	g.start = g.nodes[id]
 	g.current = g.start
+}
+
+func (g Graph) findTerminal() int {
+	for node := range g.nodes {
+		if len(g.nodes[node].neighbors) == 0 {
+			return node
+		}
+	}
+
+	return 0
+}
+
+func (g *Graph) setTerminal(id int) {
+	g.terminal = g.nodes[id]
 }
 
 func (g *Graph) transition(symbol string) {

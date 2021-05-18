@@ -13,10 +13,8 @@ type Parser struct {
 	graph Graph
 }
 
-func (p Parser) indent() {
-	for i := 0; i < p.depth; i += 1 {
-		fmt.Print(" ")
-	}
+func initParser() Parser {
+	return Parser{DEFAULT, initLexer(), 0, initGraph()}
 }
 
 func (p Parser) require(expected Token) bool {
@@ -38,6 +36,12 @@ func (p *Parser) accept(expected Token) bool {
 	}
 }
 
+func (p Parser) indent() {
+	for i := 0; i < p.depth; i += 1 {
+		fmt.Print(" ")
+	}
+}
+
 func (p Parser) enter(nt string) {
 	p.indent()
 	fmt.Println("ENTERED: " + nt)
@@ -49,11 +53,8 @@ func (p Parser) leave(nt string) {
 }
 
 func (p *Parser) parse(input string) bool {
-	p.depth = 0
 	p.lexer.storeInput(input)
 	p.token = p.lexer.nextToken()
-	p.graph.count = 0
-	p.graph.nodes = make(map[int]*Node)
 
 	var s_start int
 
@@ -61,6 +62,7 @@ func (p *Parser) parse(input string) bool {
 	if p.accept(END) {
 		fmt.Printf("Valid parse with start state of %d\n", s_start)
 		p.graph.setStart(s_start)
+		p.graph.setTerminal(p.graph.findTerminal())
 		return true
 	} else {
 		fmt.Println("Invalid parse.")
@@ -239,7 +241,7 @@ func (p *Parser) parseE() (int, int, bool) {
 
 	switch {
 		case p.require(SYMBOL):
-			n_start, n_end = p.letter(string(p.lexer.char))
+			n_start, n_end = p.symbol(string(p.lexer.char))
 			p.accept(SYMBOL)
 		case p.accept(LPAREN):
 			s_start, s_end, s_ok := p.parseS();
@@ -326,7 +328,7 @@ func (p *Parser) kleene(startA int, endA int) (int, int) {
 	return origCount + 1, origCount + 2
 }
 
-func (p *Parser) letter(symbol string) (int, int) {
+func (p *Parser) symbol(symbol string) (int, int) {
 	fmt.Println("ADDING SYMBOL")
 	origCount := p.graph.count
 

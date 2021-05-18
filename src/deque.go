@@ -11,6 +11,10 @@ type DequeNode struct {
 	next     *DequeNode
 }
 
+func initNode(s string) *DequeNode {
+	return &DequeNode{s, nil, nil}
+}
+
 /* DEQUE */
 
 type Deque struct {
@@ -18,8 +22,8 @@ type Deque struct {
 	bottom *DequeNode
 }
 
-func initNode(s string) *DequeNode {
-	return &DequeNode{s, nil, nil}
+func initDeque() Deque {
+	return Deque{nil, nil}
 }
 
 func (n *DequeNode) setValue(value string) {
@@ -120,6 +124,10 @@ func (d Deque) peekBottom() (string, bool) {
 
 type Queue Deque
 
+func initQueue() Queue {
+	return Queue(initDeque())
+}
+
 func (q Queue) isEmpty() bool {
 	return Deque(q).isEmpty()
 }
@@ -139,6 +147,10 @@ func (q Queue) peek() (string, bool) {
 /* STACK */
 
 type Stack Deque
+
+func initStack() Stack {
+	return Stack(initDeque())
+}
 
 func (s Stack) isEmpty() bool {
 	return Deque(s).isEmpty()

@@ -1,6 +1,8 @@
 #+TITLE: go-regex
 
-A regular expressions engine written in Go.
+A regular expressions engine written in Go. The commit corresponding to this README file contains code which is functional for at least some test cases. More testing
+needs to be done in order to validate program correctness. Furthermore, refactoring needs to be performed in order to clean up the code. Finally, comments and other
+extraneous documentation needs to be performed.
 
 ** Algorithm
 1. Accept a regular expression statement as input.
@@ -34,4 +36,11 @@ E → “(” S “)”
 - See parser.go for implementation.
 
 ** NFA to DFA Conversion
-- TBD
+- Start at the start state of the NFA, create a set of states reachable using only null-transitions. Call this the initial state of the DFA.
+- We will have a queue of DFA states and a set of DFA states so we can avoid repetitions.
+- Now, we will iterate over all symbols of the NFA's alphabet. Each iteration we will produce a new state of the DFA as follows: Looking at each composite state of
+  the DFA state, find the state(s) which are reachable by transitioning on whatever symbol we're iterating over. Add those states to a set, and call this set a
+  new state of the DFA. Finally, check to see if any composite state of the new DFA state is the terminus of the NFA. If so, mark the new DFA state as terminating.
+- Each time we find a new state of the DFA, check to see if we've seen it before. If we haven't add it to the set and enqueue it.
+- Repeatedly perform the above process on DFA states which are dequeued from the set. Once the queue is empty and no new states are added, the construction is
+  complete.

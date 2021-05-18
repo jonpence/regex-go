@@ -10,18 +10,20 @@ const (
 	LPAREN
 	RPAREN
 	END
+	DEFAULT
 )
 
 func tokenStr(tok Token) string {
 	switch (tok) {
-	    case SYMBOL: return "SYMBOL"
-	    case STAR:   return "STAR"
-	    case BAR:    return "BAR"
-	    case DOT:    return "DOT"
-	    case LPAREN: return "LPAREN"
-	    case RPAREN: return "RPAREN"
-	    case END:    return "END"
-	    default:     return "ERR"
+	    case SYMBOL:  return "SYMBOL"
+	    case STAR:    return "STAR"
+	    case BAR:     return "BAR"
+	    case DOT:     return "DOT"
+	    case LPAREN:  return "LPAREN"
+	    case RPAREN:  return "RPAREN"
+		case END:     return "END"
+		case DEFAULT: return "DEFAULT"
+	    default:      return "ERR"
 	}
 }
 
@@ -29,6 +31,10 @@ type Lexer struct {
 	input string
 	char  byte
 	index int
+}
+
+func initLexer() Lexer {
+	return Lexer{"", 0,  0}
 }
 
 func (l *Lexer) storeInput(input string) {
