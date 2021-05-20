@@ -3,19 +3,19 @@
 A regular expressions engine written in Go.
 
 ** TO-DO
-0. Fix Makefile.
-1. Unit test:
-  * parser
-  * automaton
-  * regex
-  * program
-2. Test exhaustively with long regular expressions and edge case regular expressions.
-3. Refactor and clean up code.
-4. Comment code.
-5. Improve terminal user interface.
-6. Document usage/implementation details/motivation in README.
-7. Add support for '+' and '?' operators.
-8. Add implicit concatenation (i.e. remove necessity of explicit concatenation operator for concatenation to occur).
+0. [X] Fix Makefile.
+1. Unit test: [0%]
+  * [-] parser
+  * [ ] automaton
+  * [ ] regex
+  * [ ] program
+2. [ ] Test exhaustively with long regular expressions and edge case regular expressions.
+3. [ ] Refactor and clean up code.
+4. [ ] Comment code.
+5. [ ] Improve terminal user interface.
+6. [ ] Document usage/implementation details/motivation in README.
+7. [ ] Add support for '+' and '?' operators.
+8. [ ] Add implicit concatenation (i.e. remove necessity of explicit concatenation operator for concatenation to occur).
 
 ** Usage
 
@@ -46,18 +46,13 @@ A regular expressions engine written in Go.
 The following LL(1) grammar will be used to recursively parse regular expression statements:
 
 #+BEGIN_SRC
-S → B C
-C → “|” B C
-C → ε
-B → D E
-E → “.” D E
-E → ε
-D → E F
-F → “*” F
-F → ε
-E → letter
-E → “ε”
-E → “(” S “)”
+S → A B
+B → '|' A B | ε
+A → C D
+D → '.' C D | ε
+C → E F
+F → '*' F | ε
+E → letter | 'ε' | '(' S ')'
 #+END_SRC
 
 *** NFA Construction

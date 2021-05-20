@@ -438,17 +438,22 @@ func (p *Parser) or(startA int, startB int, endA int, endB int) (int, int) {
 
 	currentCount := p.nfa.getCount()
 
-	ns0 := initNFAState(itos(currentCount))
-	ns1 := initNFAState(itos(currentCount + 1))
-	ns2 := initNFAState(itos(currentCount + 2))
-	ns3 := initNFAState(itos(currentCount + 3))
+	n0 := itos(currentCount)
+	n1 := itos(currentCount + 1)
+	n2 := itos(currentCount + 2)
+	n3 := itos(currentCount + 3)
 
-	p.nfa.addEdge(ns0.name, ns1.name, "")
-	p.nfa.addEdge(ns2.name, ns3.name, "")
-	p.nfa.addEdge(ns1.name, itos(startA), "")
-	p.nfa.addEdge(ns1.name, itos(startB), "")
-	p.nfa.addEdge(itos(endA), ns2.name, "")
-	p.nfa.addEdge(itos(endB), ns2.name, "")
+	p.nfa.addState(initNFAState(n0))
+	p.nfa.addState(initNFAState(n1))
+	p.nfa.addState(initNFAState(n2))
+	p.nfa.addState(initNFAState(n3))
+
+	p.nfa.addEdge(n0, n1, "")
+	p.nfa.addEdge(n2, n3, "")
+	p.nfa.addEdge(n1, itos(startA), "")
+	p.nfa.addEdge(n1, itos(startB), "")
+	p.nfa.addEdge(itos(endA), n2, "")
+	p.nfa.addEdge(itos(endB), n2, "")
 
 	return currentCount, currentCount + 3
 }
@@ -460,7 +465,9 @@ func (p *Parser) concatenate(startA int, startB int, endA int, endB int) (int, i
 	if p.debug {
 		fmt.Println("ADDING CONCATENATE")
 	}
+
 	p.nfa.addEdge(itos(endA), itos(startB), "")
+
 	return startA, endB
 }
 
@@ -473,13 +480,16 @@ func (p *Parser) kleene(startA int, endA int) (int, int) {
 	}
 	currentCount := p.nfa.getCount()
 
-	ns0 := initNFAState(itos(currentCount))
-	ns1 := initNFAState(itos(currentCount + 1))
+	n0 := itos(currentCount)
+	n1 := itos(currentCount + 1)
 
-	p.nfa.addEdge(ns0.name, ns1.name, "")
-	p.nfa.addEdge(ns0.name, itos(startA), "")
-	p.nfa.addEdge(itos(endA), ns0.name, "")
-	p.nfa.addEdge(itos(endA), ns1.name, "")
+	p.nfa.addState(initNFAState(n0))
+	p.nfa.addState(initNFAState(n1))
+
+	p.nfa.addEdge(n0, n1, "")
+	p.nfa.addEdge(n0, itos(startA), "")
+	p.nfa.addEdge(itos(endA), n0, "")
+	p.nfa.addEdge(itos(endA), n1, "")
 
 	return currentCount , currentCount + 1
 }
@@ -493,10 +503,13 @@ func (p *Parser) symbol(symbol string) (int, int) {
 	}
 	currentCount := p.nfa.getCount()
 
-	ns0 := initNFAState(itos(currentCount))
-	ns1 := initNFAState(itos(currentCount + 1))
+	n0 := itos(currentCount)
+	n1 := itos(currentCount + 1)
 
-	p.nfa.addEdge(ns0.name, ns1.name, symbol)
+	p.nfa.addState(initNFAState(n0))
+	p.nfa.addState(initNFAState(n1))
+
+	p.nfa.addEdge(n0, n1, symbol)
 
 	return currentCount, currentCount + 1
 }

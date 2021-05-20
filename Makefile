@@ -1,11 +1,13 @@
-build: src/*.go
-	go build -o regex src/*.go
+build: cmd/*/*.go internal/*/*.go
+	go build cmd/rego/*.go
 
-run: src/*.go
-	go run src/*.go
+run: build
+	./rego
 
-test: src/*.go test/*.go
-	go test test/*.go
+test: cmd/*/*.go internal/*/*.go
+	go test internal/set/*.go
+	go test internal/deque/*.go
+	go test internal/regex/*.go
 
 clean:
-	rm regex
+	rm rego
