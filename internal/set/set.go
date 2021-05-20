@@ -12,54 +12,54 @@ import (
 type Set map[string]bool
 
 /* METHODS */
-//  -- initSet() -> Set
-//  -- initSetElements([]string) -> Set
+//  -- InitSet() -> Set
+//  -- InitSetElements([]string) -> Set
 //  -- Set.size() -> int
 //  -- itos(int) -> string
-//  -- initSetRange(int, int) -> Set
-//  -- Set.isMember(string) -> bool
-//  -- *Set.add(string)
-//  -- *Set.multiadd([]string)
-//  -- *Set.remove(string) -> bool
-//  -- *Set.discard(string)
-//  -- *Set.pop() -> string
-//  -- *Set.clear()
-//  -- Set.copy() -> Set
-//  -- Set.intersection(Set) -> Set
-//  -- Set.subset(Set) -> bool
-//  -- Set.superset(Set) -> bool
-//  -- Set.properSubset(Set) -> bool
-//  -- Set.properSuperset(Set) -> bool
-//  -- Set.equivalent(Set) -> bool
-//  -- Set.difference(Set) -> Set
-//  -- Set.union(Set) -> Set
-//  -- Set.symmetricDifference(Set) -> Set
-//  -- Set.disjoint(Set) -> bool
-//  -- Set.print()
-//  -- Set.toString() -> string
+//  -- InitSetRange(int, int) -> Set
+//  -- Set.IsMember(string) -> bool
+//  -- *Set.Add(string)
+//  -- *Set.Multiadd([]string)
+//  -- *Set.Remove(string) -> bool
+//  -- *Set.Discard(string)
+//  -- *Set.Pop() -> string
+//  -- *Set.Clear()
+//  -- Set.Copy() -> Set
+//  -- Set.Intersection(Set) -> Set
+//  -- Set.Subset(Set) -> bool
+//  -- Set.Superset(Set) -> bool
+//  -- Set.ProperSubset(Set) -> bool
+//  -- Set.ProperSuperset(Set) -> bool
+//  -- Set.Equivalent(Set) -> bool
+//  -- Set.Difference(Set) -> Set
+//  -- Set.Union(Set) -> Set
+//  -- Set.SymmetricDifference(Set) -> Set
+//  -- Set.Disjoint(Set) -> bool
+//  -- Set.Print()
+//  -- Set.ToString() -> string
 
 
 /*******************************************************************************/
 
 
-/* initSet() -> Set
+/* InitSet() -> Set
 /*
 /* Instantiates a new map[string]bool and returns it cast to a Set.
  */
-func initSet() Set {
+func InitSet() Set {
 	return Set(make(map[string]bool))
 }
 
-/* initSetElements([]string) -> Set
+/* InitSetElements([]string) -> Set
 /*
 /* Instantiates a new map[string]bool and initializes its elements with */
 /* the string slice parameter. Then returns it cast to a Set.
  */
-func initSetElements(elements []string) Set {
-	newSet := initSet()
+func InitSetElements(elements []string) Set {
+	newSet := InitSet()
 
 	for _, element := range elements {
-		newSet.add(element)
+		newSet.Add(element)
 	}
 
 	return newSet
@@ -69,7 +69,7 @@ func initSetElements(elements []string) Set {
 /*
 /* Returns the number of elements in the set.
  */
-func (s Set) size() int {
+func (s Set) Size() int {
 	return len(s)
 }
 
@@ -81,56 +81,56 @@ func itos(n int) string {
 	return fmt.Sprint(n)
 }
 
-/* initSetRange(int, int) -> Set
+/* InitSetRange(int, int) -> Set
 /*
 /* Instantiates a new set and fills it with elements ranging from low to high
 /* exclusive. Then returns the new set.
  */
-func initSetRange(lower int, upper int) Set {
-	newSet := initSet()
+func InitSetRange(lower int, upper int) Set {
+	newSet := InitSet()
 
 	for ; lower < upper; lower++ {
-		newSet.add(itos(lower))
+		newSet.Add(itos(lower))
 	}
 
 	return newSet
 }
 
-/* Set.isMember(string) -> bool
+/* Set.IsMember(string) -> bool
 /*
 /* Returns true if string parameter is a member of the set.
  */
-func (s Set) isMember(str string) bool {
+func (s Set) IsMember(str string) bool {
 	present, member := s[str]
 
 	return present && member
 }
 
-/* *Set.add(string)
+/* *Set.Add(string)
 /*
 /* Adds string parameter as member of the set.
  */
-func (s *Set) add(str string) {
+func (s *Set) Add(str string) {
 	(*s)[str] = true
 }
 
-/* *Set.multiadd([]string)
+/* *Set.Multiadd([]string)
 /*
 /* Adds all members of []string parameter as members of the set.
  */
-func (s *Set) multiadd(strs []string) {
+func (s *Set) Multiadd(strs []string) {
 	for _, str := range strs {
-		s.add(str)
+		s.Add(str)
 	}
 }
 
-/* *Set.remove(string) -> bool
+/* *Set.Remove(string) -> bool
 /*
-/* If string parameter is a member of the set, remove it and return true.
+/* If string parameter is a member of the set, Remove it and return true.
 /* Otherwise return false if string parameter is not a member.
  */
-func (s *Set) remove(str string) bool {
-	if s.isMember(str) {
+func (s *Set) Remove(str string) bool {
+	if s.IsMember(str) {
 		(*s)[str] = false
 		return true
 	} else {
@@ -138,26 +138,26 @@ func (s *Set) remove(str string) bool {
 	}
 }
 
-/* *Set.discard(string)
+/* *Set.Discard(string)
 /*
 /* Remove string parameter from set and do not report if the string parameter
 /* was not detected as an element of the set.
  */
-func (s *Set) discard(str string) {
-	if s.isMember(str) {
+func (s *Set) Discard(str string) {
+	if s.IsMember(str) {
 		(*s)[str] = false
 	}
 }
 
-/* *Set.pop() -> (string, bool)
+/* *Set.Pop() -> (string, bool)
 /*
 /* Remove a random element from the set and return it and return true. If the */
 /* set is empty, return the empty string and report false.
  */
-func (s *Set) pop() (string, bool) {
+func (s *Set) Pop() (string, bool) {
 	for element := range *s {
-		if s.isMember(element) {
-			s.remove(element)
+		if s.IsMember(element) {
+			s.Remove(element)
 			return element, true
 		}
 	}
@@ -165,42 +165,42 @@ func (s *Set) pop() (string, bool) {
 	return "", false
 }
 
-/* *Set.clear()
+/* *Set.Clear()
 /*
 /* Removes all elements from the set.
  */
-func (s *Set) clear() {
+func (s *Set) Clear() {
 	for element := range *s {
-		s.remove(element)
+		s.Remove(element)
 	}
 }
 
-/* Set.copy() -> Set
+/* Set.Copy() -> Set
 /*
-/* Returns a copy of the set.
+/* Returns a Copy of the set.
  */
-func (s Set) copy() Set {
-	newSet := initSet()
+func (s Set) Copy() Set {
+	newSet := InitSet()
 
 	for element := range s {
-		if s.isMember(element) {
-			newSet.add(element)
+		if s.IsMember(element) {
+			newSet.Add(element)
 		}
 	}
 
 	return newSet
 }
 
-/* Set.intersection(Set) -> Set
+/* Set.Intersection(Set) -> Set
 /*
-/* Returns the intersection of the sets.
+/* Returns the Intersection of the sets.
  */
-func (setA Set) intersection(setB Set) Set {
+func (setA Set) Intersection(setB Set) Set {
 	var larger, smaller *Set
 
-	newSet := initSet()
+	newSet := InitSet()
 
-	if len(setA) > len(setB) {
+	if setA.Size() > setB.Size() {
 		larger = &setA
 		smaller = &setB
 	} else {
@@ -209,21 +209,21 @@ func (setA Set) intersection(setB Set) Set {
 	}
 
 	for element := range *larger {
-		if larger.isMember(element) && smaller.isMember(element) {
-			newSet.add(element)
+		if larger.IsMember(element) && smaller.IsMember(element) {
+			newSet.Add(element)
 		}
 	}
 
 	return newSet
 }
 
-/* Set.subset(Set) -> bool
+/* Set.Subset(Set) -> bool
 /*
-/* Returns true if the set is a subset of the other set.
+/* Returns true if the set is a Subset of the other set.
  */
-func (setA Set) subset(setB Set) bool {
+func (setA Set) Subset(setB Set) bool {
 	for element := range setA {
-		if setA.isMember(element) && !setB.isMember(element) {
+		if setA.IsMember(element) && !setB.IsMember(element) {
 			return false
 		}
 	}
@@ -231,104 +231,104 @@ func (setA Set) subset(setB Set) bool {
 	return true
 }
 
-/* Set.superset(Set) -> bool
+/* Set.Superset(Set) -> bool
 /*
-/* Returns true if the set is a superset of the other set.
+/* Returns true if the set is a Superset of the other set.
  */
-func (setA Set) superset(setB Set) bool {
-	return setB.subset(setA)
+func (setA Set) Superset(setB Set) bool {
+	return setB.Subset(setA)
 }
 
-/* Set.properSubset(Set) -> bool
+/* Set.ProperSubset(Set) -> bool
 /*
-/* Returns true if the set is a proper subset of the other set.
+/* Returns true if the set is a Proper Subset of the other set.
  */
-func (setA Set) properSubset(setB Set) bool {
-	return setA.subset(setB) && !setB.subset(setA)
+func (setA Set) ProperSubset(setB Set) bool {
+	return setA.Subset(setB) && !setB.Subset(setA)
 }
 
-/* Set.properSuperset(Set) -> bool
+/* Set.ProperSuperset(Set) -> bool
 /*
-/* Returns true if the set is a proper superset of the other set.
+/* Returns true if the set is a Proper Superset of the other set.
  */
-func (setA Set) properSuperset(setB Set) bool {
-	return setA.superset(setB) && !setB.superset(setA)
+func (setA Set) ProperSuperset(setB Set) bool {
+	return setA.Superset(setB) && !setB.Superset(setA)
 }
 
-/* Set.equivalent(Set) -> bool
+/* Set.Equivalent(Set) -> bool
 /*
-/* Returns true if the set is equivalent with the other set.
+/* Returns true if the set is Equivalent with the other set.
  */
-func (setA Set) equivalent(setB Set) bool {
-	return setA.subset(setB) && setB.subset(setA)
+func (setA Set) Equivalent(setB Set) bool {
+	return setA.Subset(setB) && setB.Subset(setA)
 }
 
-/* Set.difference(Set) -> Set
+/* Set.Difference(Set) -> Set
 /*
-/* Returns the difference between the set and the other set.
+/* Returns the Difference between the set and the other set.
  */
-func (setA Set) difference(setB Set) Set {
-	newSet := initSet()
-	intersection := setA.intersection(setB)
+func (setA Set) Difference(setB Set) Set {
+	newSet := InitSet()
+	Intersection := setA.Intersection(setB)
 
 	for element := range setA {
-		if setA.isMember(element) && !intersection.isMember(element) {
-			newSet.add(element)
+		if setA.IsMember(element) && !Intersection.IsMember(element) {
+			newSet.Add(element)
 		}
 	}
 
 	return newSet
 }
 
-/* Set.union(Set) -> Set
+/* Set.Union(Set) -> Set
 /*
-/* Returns the union of the set with the other set.
+/* Returns the Union of the set with the other set.
  */
-func (setA Set) union(setB Set) Set {
-	newSet := initSet()
+func (setA Set) Union(setB Set) Set {
+	newSet := InitSet()
 
 	for element := range setA {
-		if setA.isMember(element) {
-			newSet.add(element)
+		if setA.IsMember(element) {
+			newSet.Add(element)
 		}
 	}
 
 	for element := range setB {
-		if setB.isMember(element) {
-			newSet.add(element)
+		if setB.IsMember(element) {
+			newSet.Add(element)
 		}
 	}
 
 	return newSet
 }
 
-/* Set.symmetricDifference(Set) -> Set
+/* Set.SymmetricDifference(Set) -> Set
 /*
-/* Returns the difference of the union of the set and the other set with the */
-/* intersection of the set and the other set.
+/* Returns the Difference of the Union of the set and the other set with the */
+/* Intersection of the set and the other set.
  */
-func (setA Set) symmetricDifference(setB Set) Set {
-	return setA.union(setB).difference(setA.intersection(setB))
+func (setA Set) SymmetricDifference(setB Set) Set {
+	return setA.Union(setB).Difference(setA.Intersection(setB))
 }
 
-/* Set.disjoint(Set) -> bool
+/* Set.Disjoint(Set) -> bool
 /*
-/* Returns true if the set is disjoint with the other set.
+/* Returns true if the set is Disjoint with the other set.
  */
-func (setA Set) disjoint(setB Set) bool {
-	return setA.intersection(setB).isEmpty()
+func (setA Set) Disjoint(setB Set) bool {
+	return setA.Intersection(setB).IsEmpty()
 }
 
-/* Set.isEmpty() -> bool
+/* Set.IsEmpty() -> bool
 /*
 /* Returns true if the set is empty.
  */
-func (s Set) isEmpty() bool {
+func (s Set) IsEmpty() bool {
 	if len(s) == 0 {
 		return true
 	} else {
 		for element := range s {
-			if s.isMember(element) {
+			if s.IsMember(element) {
 				return false
 			}
 		}
@@ -337,26 +337,26 @@ func (s Set) isEmpty() bool {
 	}
 }
 
-/* Set.print()
+/* Set.Print()
 /*
 /* Prints out the set's elements.
  */
-func (s Set) print() {
-	fmt.Println(s.toString())
+func (s Set) Print() {
+	fmt.Println(s.ToString())
 }
 
-/* Set.toString() -> string
+/* Set.ToString() -> string
 /*
 /* Returns a string of the set's elements.
  */
-func (s Set) toString() string {
+func (s Set) ToString() string {
 	var buf string
 	buf = buf + "{"
 
 	first := true
 
 	for element := range s {
-		if s.isMember(element) {
+		if s.IsMember(element) {
 			if !first {
 				buf = buf + fmt.Sprintf(", %s", element)
 			} else {

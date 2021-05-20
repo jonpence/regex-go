@@ -6,9 +6,6 @@ import (
 	"github.com/jonpence/regex-go/internal/deque"
 )
 
-// MISC METHODS
-// getIds
-
 // STATE METHODS
 // initState
 // addNeighbor
@@ -35,17 +32,17 @@ import (
 type State struct {
 	name           string
 	neighbors      map[string][]string
-	composites     Set
+	composites     set.Set
 	terminates     bool
 	dfaState       bool
 }
 
 func initNFAState(name string) State {
-	return State{name, make(map[string][]string), initSet(), false, false}
+	return State{name, make(map[string][]string), set.InitSet(), false, false}
 }
 
-func initDFAState(composites Set) State {
-	return State{composites.toString(), make(map[string][]string), composites, false, true}
+func initDFAState(composites set.Set) State {
+	return State{composites.ToString(), make(map[string][]string), composites, false, true}
 }
 
 func (s *State) addNeighbor(dest string, input string) {
@@ -82,16 +79,6 @@ func (s State) getNeighbor(input string) (string, bool) {
 	} else {
 		return "", false
 	}
-}
-
-func getIds(nodes []*Node) []int {
-	ids := []int{}
-
-	for _, node := range nodes {
-		ids = append(ids, node.id)
-	}
-
-	return ids
 }
 
 func (s State) printNFAState() {
@@ -140,12 +127,12 @@ type Automaton struct {
 	states  map[string]*State
 	start   *State
 	current *State
-	inputs  Set
+	inputs  set.Set
 	count   int
 }
 
 func initAutomaton() *Automaton {
-	return &Automaton{make(map[string]*State), nil, nil, initSet(), 0}
+	return &Automaton{make(map[string]*State), nil, nil, set.InitSet(), 0}
 }
 
 func (a *Automaton) addState(s *State) {
@@ -189,13 +176,13 @@ func (a *Automaton) transition(char byte) bool {
 }
 
 func (a *Automaton) closureOfOn(state *State, input string) *State {
-	newComposites := initSet()
+	newComposites := set.InitSet()
 	terminates    := false
 
 	// initialize composites with all reachable states from state on input
 	for composite := range state.composites {
 		neighbors, _ := a.getState(composite).getNeighborList(input)
-		newComposites.multiadd(neighbors)
+		newComposites.Multiadd(neighbors)
 	}
 
 	// reach all nil-reachable states
@@ -207,9 +194,9 @@ func (a *Automaton) closureOfOn(state *State, input string) *State {
 			nullReachable, _ := a.getState(newComposite).getNeighborList("")
 
 			for _, nullReached := range nullReachable {
-				if !newComposites.isMember(nullReached) {
+				if !newComposites.IsMember(nullReached) {
 					addedNew = true
-					newComposites.add(nullReached)
+					newComposites.Add(nullReached)
 				}
 			}
 		}
@@ -232,17 +219,17 @@ func (a *Automaton) closureOfOn(state *State, input string) *State {
 
 func (a *Automaton) determinize() *Automaton {
 	dfa   := initAutomaton()
-	queue := initQueue()
+	queue := deque.InitQueue()
 
 	initialState := a.closureOfOn(a.start, "")
 
 	dfa.addState(initialState)
 	dfa.setStart(initialState)
 
-	queue.enqueue(initialState.name)
+	queue.Enqueue(initialState.name)
 
 	for {
-		currentState, ok := queue.dequeue()
+		currentState, ok := queue.Dequeue()
 
 		if !ok {
 			break
@@ -257,7 +244,7 @@ func (a *Automaton) determinize() *Automaton {
 
 			if _, present := a.states[newState.name]; !present {
 				dfa.addState(newState)
-				queue.enqueue(newState.name)
+				queue.Enqueue(newState.name)
 			}
 
 			dfa.addEdge(currentState, newState.name, input)

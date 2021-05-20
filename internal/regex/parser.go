@@ -18,6 +18,7 @@ type Parser struct {
 }
 
 /* METHODS */
+//  -- itos(int) -> string
 //  -- initParser() -> Parser
 //  -- *Parser.setDebug()
 //  -- *Parser.unsetDebug()
@@ -38,6 +39,13 @@ type Parser struct {
 //  -- *Parser.concatenate(int, int, int, int) -> int, int
 //  -- *Parser.kleene(int, int) -> int, int
 //  -- *Parser.symbol(string) -> int, int
+
+/* itos(int) -> string
+/*
+ */
+func itos(num int) string {
+	return fmt.Sprint(num)
+}
 
 /* initParser() -> Parser
 /*
@@ -134,10 +142,10 @@ func (p *Parser) parse(input string) bool {
 		}
 
 		// set terminating state
-		p.nfa.getState(intToString(s_end)).setTerminates()
+		p.nfa.getState(itos(s_end)).setTerminates()
 
 		// set start
-		p.nfa.setStart(p.nfa.getState(intToString(s_start)))
+		p.nfa.setStart(p.nfa.getState(itos(s_start)))
 
 		// succesful parse
 		return true
@@ -430,17 +438,17 @@ func (p *Parser) or(startA int, startB int, endA int, endB int) (int, int) {
 
 	currentCount := p.nfa.getCount()
 
-	ns0 := initNFAState(intToString(currentCount))
-	ns1 := initNFAState(intToString(currentCount + 1))
-	ns2 := initNFAState(intToString(currentCount + 2))
-	ns3 := initNFAState(intToString(currentCount + 3))
+	ns0 := initNFAState(itos(currentCount))
+	ns1 := initNFAState(itos(currentCount + 1))
+	ns2 := initNFAState(itos(currentCount + 2))
+	ns3 := initNFAState(itos(currentCount + 3))
 
 	p.nfa.addEdge(ns0.name, ns1.name, "")
 	p.nfa.addEdge(ns2.name, ns3.name, "")
-	p.nfa.addEdge(ns1.name, intToString(startA), "")
-	p.nfa.addEdge(ns1.name, intToString(startB), "")
-	p.nfa.addEdge(intToString(endA), ns2.name, "")
-	p.nfa.addEdge(intToString(endB), ns2.name, "")
+	p.nfa.addEdge(ns1.name, itos(startA), "")
+	p.nfa.addEdge(ns1.name, itos(startB), "")
+	p.nfa.addEdge(itos(endA), ns2.name, "")
+	p.nfa.addEdge(itos(endB), ns2.name, "")
 
 	return currentCount, currentCount + 3
 }
@@ -452,7 +460,7 @@ func (p *Parser) concatenate(startA int, startB int, endA int, endB int) (int, i
 	if p.debug {
 		fmt.Println("ADDING CONCATENATE")
 	}
-	p.nfa.addEdge(intToString(endA), intToString(startB), "")
+	p.nfa.addEdge(itos(endA), itos(startB), "")
 	return startA, endB
 }
 
@@ -465,13 +473,13 @@ func (p *Parser) kleene(startA int, endA int) (int, int) {
 	}
 	currentCount := p.nfa.getCount()
 
-	ns0 := initNFAState(intToString(currentCount))
-	ns1 := initNFAState(intToString(currentCount + 1))
+	ns0 := initNFAState(itos(currentCount))
+	ns1 := initNFAState(itos(currentCount + 1))
 
 	p.nfa.addEdge(ns0.name, ns1.name, "")
-	p.nfa.addEdge(ns0.name, intToString(startA), "")
-	p.nfa.addEdge(intToString(endA), ns0.name, "")
-	p.nfa.addEdge(intToString(endA), ns1.name, "")
+	p.nfa.addEdge(ns0.name, itos(startA), "")
+	p.nfa.addEdge(itos(endA), ns0.name, "")
+	p.nfa.addEdge(itos(endA), ns1.name, "")
 
 	return currentCount , currentCount + 1
 }
@@ -485,8 +493,8 @@ func (p *Parser) symbol(symbol string) (int, int) {
 	}
 	currentCount := p.nfa.getCount()
 
-	ns0 := initNFAState(intToString(currentCount))
-	ns1 := initNFAState(intToString(currentCount + 1))
+	ns0 := initNFAState(itos(currentCount))
+	ns1 := initNFAState(itos(currentCount + 1))
 
 	p.nfa.addEdge(ns0.name, ns1.name, symbol)
 

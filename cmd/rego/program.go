@@ -10,13 +10,13 @@ import (
 )
 
 type Program struct {
-	regex     []Regex
+	regex     []regex.Regex
 	reader    *bufio.Reader
 	running   bool
 }
 
 func initProgram() Program {
-	return Program{[]Regex{}, bufio.NewReader(os.Stdin), true}
+	return Program{[]regex.Regex{}, bufio.NewReader(os.Stdin), true}
 }
 
 func (p Program) readInput() (string, bool) {
