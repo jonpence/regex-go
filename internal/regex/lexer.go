@@ -2,7 +2,7 @@
  *
  * Implements a lexer which tokenizes regular expressions.
  */
-package main
+package regex
 
 type Token int
 

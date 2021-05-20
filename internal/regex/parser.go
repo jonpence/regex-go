@@ -3,7 +3,7 @@
 /* Implements a recursive descent parser for regular expressions.
  */
 
-package main
+package regex
 
 import (
 	"fmt"

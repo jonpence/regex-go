@@ -1,4 +1,4 @@
-package main
+package regex
 
 type Regex struct {
 	expression string

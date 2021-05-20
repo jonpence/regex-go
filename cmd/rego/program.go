@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"github.com/jonpence/regex-go/internal/regex"
 )
 
 type Program struct {

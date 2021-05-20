@@ -1,13 +1,8 @@
-package main
+package set
 
 import (
 	"testing"
 )
-
-// if condition {
-//     t.Errorf("error message")
-// }
-
 
 func TestInitSet(t *testing.T) {
 	testSet := initSet()
@@ -155,7 +150,7 @@ func TestDiscard(t *testing.T) {
 func TestPop(t *testing.T) {
 	testSet := initSetRange(1, 11)
 
-	for testSet.pop() { }
+	for _, ok := testSet.pop(); ok; _, ok = testSet.pop() { }
 
 	if !testSet.isEmpty() {
 		t.Errorf("expected testSet to be empty")
@@ -269,11 +264,11 @@ func TestEquivalent(t *testing.T) {
 
 func TestDifference(t *testing.T) {
 	testSetA := initSetRange(1, 21)
-	testSetB := initSetRange(1, 11)
+	testSetB := initSetRange(1, 10)
 	testSetC := initSetRange(10, 21)
 
 	if !testSetC.equivalent(testSetA.difference(testSetB)) {
-		t.Errorf("expected testSetC to be equivalent with testSetA - testSetB")
+		t.Errorf("expected testSetC to be equivalent with testSetA - testSetB, instead:\n\ttestSetC is \n\t\t%s\n\ttestSetA - testSetB is\n\t\t%s", testSetC.toString(), testSetA.difference(testSetB).toString())
 	}
 }
 
@@ -317,15 +312,11 @@ func TestDisjoint(t *testing.T) {
 	}
 }
 
-func TestPrint(t *testing.T) {
-	testSetA := initSetRange(0, 21)
-	testSetA.print()
-}
-
 func TestToString(t *testing.T) {
-	testSetA := initSetRange(1, 6)
+	testString := "{1, 2, 3, 4, 5, 6}"
+	testSet   := initSetRange(1, 7)
 
-	if "{1, 2, 3, 4, 5, 6}" != testSetA.toString() {
-		t.Errorf("expeted testSetA's string to be {1, 2, 3, 4, 5, 6}")
+	if testString != testSet.toString() {
+		t.Errorf("expeted testSet's string to be %s, instead testSet is %s", testString, testSet.toString())
 	}
 }

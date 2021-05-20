@@ -1,7 +1,9 @@
-package main
+package regex
 
 import (
 	"fmt"
+	"github.com/jonpence/regex-go/internal/set"
+	"github.com/jonpence/regex-go/internal/deque"
 )
 
 // MISC METHODS

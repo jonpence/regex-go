@@ -3,7 +3,7 @@
 /* Implements a set of strings.
  */
 
-package main
+package set
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ type Set map[string]bool
 //  -- initSet() -> Set
 //  -- initSetElements([]string) -> Set
 //  -- Set.size() -> int
-//  -- intToString(int) -> string
+//  -- itos(int) -> string
 //  -- initSetRange(int, int) -> Set
 //  -- Set.isMember(string) -> bool
 //  -- *Set.add(string)
@@ -73,18 +73,12 @@ func (s Set) size() int {
 	return len(s)
 }
 
-/* intToString(int) -> string
+/* itos(int) -> string
 /*
 /* Returns a string encoding of the int parameter.
  */
-func intToString(n int) string {
-	buf := ""
-
-	for ; n > 0; n /= 10 {
-		buf = string((n % 10) + 48) + buf
-	}
-
-	return buf
+func itos(n int) string {
+	return fmt.Sprint(n)
 }
 
 /* initSetRange(int, int) -> Set
@@ -96,7 +90,7 @@ func initSetRange(lower int, upper int) Set {
 	newSet := initSet()
 
 	for ; lower < upper; lower++ {
-		newSet.add(intToString(lower))
+		newSet.add(itos(lower))
 	}
 
 	return newSet
