@@ -4,22 +4,54 @@ import (
 	"fmt"
 )
 
+// MISC METHODS
+// getIds
+
+// STATE METHODS
+// initState
+// addNeighbor
+// setTerminates
+// unsetTerminates
+// getNeighborList
+// getNeighbor
+// reachableFrom
+// printState
+
+// AUTOMATON METHODS
+// initAutomaton
+// addState
+// addEdge
+// setStart
+// setCurrent
+// reset
+// transition
+// convertFrom
+// validate
 
 /* STATE */
 
 type State struct {
-	composites     []*Node
 	name           string
-	transitions    map[string]string
+	neighbors      map[string][]string
+	composites     Set
 	terminates     bool
+	dfaState       bool
 }
 
-func initState(composites []*Node, compositeNames Set) State {
-	return State{composites, compositeNames.toString(), make(map[string]string), false}
+func initNFAState(name string) State {
+	return State{name, make(map[string][]string), initSet(), false, false}
 }
 
-func (s *State) addTransition(dest string, input string) {
-	s.transitions[input] = dest
+func initDFAState(composites Set) State {
+	return State{composites.toString(), make(map[string][]string), composites, false, true}
+}
+
+func (s *State) addNeighbor(dest string, input string) {
+	if s.dfaState {
+		s.neighbors[input][0] = dest
+	} else {
+		s.neighbors[input] = append(s.neighbors[input], dest)
+	}
 }
 
 func (s *State) setTerminates() {
@@ -28,6 +60,26 @@ func (s *State) setTerminates() {
 
 func (s *State) unsetTerminates() {
 	s.terminates = false
+}
+
+func (s State) getNeighborList(input string) ([]string, bool) {
+	neighborList, present := s.neighbors[input]
+
+	if present {
+		return neighborList, true
+	} else {
+		return nil, false
+	}
+}
+
+func (s State) getNeighbor(input string) (string, bool) {
+	neighborList, present := s.getNeighborList(input)
+
+	if present {
+		return neighborList[0], true
+	} else {
+		return "", false
+	}
 }
 
 func getIds(nodes []*Node) []int {
@@ -40,69 +92,42 @@ func getIds(nodes []*Node) []int {
 	return ids
 }
 
-func (s *State) reachableFrom(input string) ([]*Node, Set) {
-	composites := []*Node{}
-	compositeNames := initSet()
-
-	// initialize composites with all reachable states from s on input
-	for _, node := range s.composites {
-		composites = append(composites, node.transitionOn(input)...)
+func (s State) printNFAState() {
+	if s.terminates {
+		fmt.Printf("%s*", s.name)
+	} else {
+		fmt.Printf("%s", s.name)
 	}
-
-	for _, node := range composites {
-		compositeNames.add(intToString(node.id))
-	}
-
-	// reach all nil-reachable states
-	addedNew := true
-	for addedNew == true {
-		addedNew = false
-
-		for _, node := range composites {
-			temp := node.transitionOn("")
-
-			for _, tempNode := range temp {
-				tempNodeName := intToString(tempNode.id)
-
-				if !compositeNames.isMember(tempNodeName) {
-					addedNew = true
-					compositeNames.add(tempNodeName)
-				}
+	if len(s.neighbors) == 0 {
+		fmt.Print("\tEMPTY\n")
+	} else {
+		for symbol := range s.neighbors {
+			fmt.Print("\t[")
+			if symbol == "" {
+				fmt.Print("ε")
+			} else {
+				fmt.Print(symbol)
 			}
-
-			composites = append(composites, node.transitionOn("")...)
+			fmt.Print(" -> ")
+			for i := 0; i < len(s.neighbors[symbol]) - 1; i++ {
+				fmt.Printf("%s, ", s.neighbors[symbol][i])
+			}
+			fmt.Printf("%s]\n", s.neighbors[symbol][len(s.neighbors[symbol]) - 1])
 		}
 	}
-
-	// add rest of names to set, set terminates
-	for _, node := range composites {
-		compositeNames.add(intToString(node.id))
-	}
-
-	return composites, compositeNames
 }
 
-func (s State) transition(input string) (string, bool) {
-	dest, present := s.transitions[input]
-
-	if present {
-		return dest, true
-	} else {
-		return "", false
-	}
-}
-
-func (s State) printState() {
+func (s State) printDFAState() {
 	if s.terminates {
 		fmt.Printf("%s*\n", s.name)
 	} else {
 		fmt.Printf("%s\n", s.name)
 	}
-	if len(s.transitions) == 0 {
+	if len(s.neighbors) == 0 {
 		fmt.Print("\tEMPTY\n")
 	} else {
-		for i := range s.transitions {
-			fmt.Printf("\t[%s -> %s]\n", i, s.transitions[i])
+		for symbol := range s.neighbors {
+			fmt.Printf("\t[%s -> %s]\n", symbol, s.neighbors[symbol][0])
 		}
 	}
 }
@@ -113,19 +138,21 @@ type Automaton struct {
 	states  map[string]*State
 	start   *State
 	current *State
-	inputs Set
+	inputs  Set
+	count   int
 }
 
-func initAutomaton() Automaton {
-	return Automaton{make(map[string]*State), nil, nil, initSet()}
+func initAutomaton() *Automaton {
+	return &Automaton{make(map[string]*State), nil, nil, initSet(), 0}
 }
 
 func (a *Automaton) addState(s *State) {
 	a.states[s.name] = s
+	a.count += 1
 }
 
 func (a *Automaton) addEdge(src string, dest string, input string) {
-	a.states[src].addTransition(dest, input)
+	a.states[src].addNeighbor(dest, input)
 }
 
 func (a *Automaton) setStart(s *State) {
@@ -136,12 +163,20 @@ func (a *Automaton) setCurrent(s *State) {
 	a.current = s
 }
 
+func (a Automaton) getState(input string) *State {
+	return a.states[input]
+}
+
+func (a Automaton) getCount() int {
+	return a.count
+}
+
 func (a *Automaton) reset() {
 	a.setCurrent(a.start)
 }
 
 func (a *Automaton) transition(char byte) bool {
-	dest, present := a.current.transition(string(char))
+	dest, present := a.current.getNeighbor(string(char))
 
 	if present {
 		a.setCurrent(a.states[dest])
@@ -151,63 +186,83 @@ func (a *Automaton) transition(char byte) bool {
 	return false
 }
 
-// TODO Move this to graph, or refactor code to avoid this hack
-func (g Graph) containsTerminus(nodes []*Node) bool {
-	for _, node := range nodes {
-		if node == g.terminal {
-			return true
+func (a *Automaton) closureOfOn(state *State, input string) *State {
+	newComposites := initSet()
+	terminates    := false
+
+	// initialize composites with all reachable states from state on input
+	for composite := range state.composites {
+		neighbors, _ := a.getState(composite).getNeighborList(input)
+		newComposites.multiadd(neighbors)
+	}
+
+	// reach all nil-reachable states
+	addedNew := true
+	for addedNew == true {
+		addedNew = false
+
+		for newComposite := range newComposites {
+			nullReachable, _ := a.getState(newComposite).getNeighborList("")
+
+			for _, nullReached := range nullReachable {
+				if !newComposites.isMember(nullReached) {
+					addedNew = true
+					newComposites.add(nullReached)
+				}
+			}
 		}
 	}
 
-	return false
-}
-
-func (a *Automaton) convertFrom(g Graph) {
-	a.inputs = g.inputs
-	queue := initQueue()
-
-	startState   := initState([]*Node{g.start}, initSetRange(g.start.id, g.start.id + 1))
-	initialStates, initialNames := startState.reachableFrom("")
-	initialStates = append(initialStates, g.start)
-	initialNames.add(intToString(g.start.id))
-	initialState := initState(initialStates, initialNames)
-
-	if g.containsTerminus(initialStates) {
-		initialState.setTerminates()
+	for newComposite := range newComposites {
+		if a.getState(newComposite).terminates {
+			terminates = true
+		}
 	}
 
-	a.addState(&initialState)
-	a.setStart(&initialState)
+	newState := initDFAState(newComposites)
+
+	if terminates {
+		newState.setTerminates()
+	}
+
+	return &newState
+}
+
+func (a *Automaton) determinize() *Automaton {
+	dfa   := initAutomaton()
+	queue := initQueue()
+
+	initialState := a.closureOfOn(a.start, "")
+
+	dfa.addState(initialState)
+	dfa.setStart(initialState)
+
 	queue.enqueue(initialState.name)
 
 	for {
-		currentStateName, ok := queue.dequeue()
+		currentState, ok := queue.dequeue()
 
 		if !ok {
 			break
 		}
 
 		for input := range a.inputs {
-			newState := initState(a.states[currentStateName].reachableFrom(input))
+			newState := a.closureOfOn(dfa.getState(currentState), input)
 
 			if newState.name == "{}" {
 				continue
 			}
 
 			if _, present := a.states[newState.name]; !present {
-				a.addState(&newState)
+				dfa.addState(newState)
 				queue.enqueue(newState.name)
 			}
 
-			if g.containsTerminus(newState.composites) {
-				newState.setTerminates()
-			}
-
-			a.addEdge(currentStateName, newState.name, input)
+			dfa.addEdge(currentState, newState.name, input)
 		}
 	}
 
-	a.setCurrent(a.start)
+	return dfa
 }
 
 func (a Automaton) validate(input string) bool {

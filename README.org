@@ -6,12 +6,13 @@ The commit corresponding to this README file contains code which is functional f
 needs to be done in order to validate program correctness. Furthermore, refactoring needs to be performed in order to clean up the code. Finally, comments and other
 extraneous documentation needs to be performed.
 
-** TODO
+** TO-DO
 1. Implement actual usage functionality.
 2. Refactor code.
 3. Comment and document code.
 4. Write unit tests.
 5. Rewrite README.
+6. Move IntToString() from Set.go to some etc.go
 ** Usage
 
 *** How to Build
@@ -20,6 +21,13 @@ extraneous documentation needs to be performed.
 *** Execution
 - ./main
 - A menu will appear. You can add new regular expressions, delete them, or use them to validate strings.
+- Regular expressions can be composed using the following operands/operators:
+  + Any symbol can be an operand.
+  + Expressions can be surrounded by parentheses to modify precedence.
+  + concatenation: '.' between two sections will concatenate them.
+  + or: '|' between two sections will designate that either section is valid.
+  + kleene closure: '*' after a section will indicate that zero or more of that section is valid.
+- In the future, additional unary operators '+' and '?' will be added.
 
 ** Implementation
 

@@ -4,9 +4,25 @@ import (
 	"fmt"
 )
 
+// NODE METHODS
+// addNeighbor
+// transitionOn
+// printNode
+
+// GRAPH METHODS
+// initGraph
+// addNode
+// addEdge
+// setStart
+// findTerminal
+// setTerminal
+// transition
+
+
 type Node struct {
 	id        int
 	neighbors map[string][]*Node
+	terminates bool
 }
 
 type Graph struct {
@@ -18,6 +34,10 @@ type Graph struct {
 	inputs   Set
 }
 
+func (n *Node) setTerminates() {
+	n.terminates = true
+}
+
 func (n *Node) addNeighbor(symbol string, dest *Node) {
 	n.neighbors[symbol] = append(n.neighbors[symbol], dest)
 }
@@ -27,7 +47,11 @@ func (n Node) transitionOn(input string) []*Node {
 }
 
 func (n Node) printNode() {
-	fmt.Printf("%d", n.id)
+	if n.terminates {
+		fmt.Printf("%d*", n.id)
+	} else {
+		fmt.Printf("%d", n.id)
+	}
 	if len(n.neighbors) == 0 {
 		fmt.Print("\tEMPTY\n")
 	} else {
@@ -53,7 +77,7 @@ func initGraph() Graph {
 
 func (g *Graph) addNode() int {
 	g.count += 1
-	n := Node{g.count, make(map[string][]*Node)}
+	n := Node{g.count, make(map[string][]*Node), false}
 	g.nodes[n.id] = &n
 
 	return n.id

@@ -1,4 +1,6 @@
-/* Implements a Set data type using a map[string]bool hashmap.
+/* set.go
+/*
+/* Implements a set of strings.
  */
 
 package main
@@ -7,7 +9,6 @@ import (
 	"fmt"
 )
 
-/* DATA */
 type Set map[string]bool
 
 /* METHODS */
@@ -18,6 +19,7 @@ type Set map[string]bool
 //  -- initSetRange(int, int) -> Set
 //  -- Set.isMember(string) -> bool
 //  -- *Set.add(string)
+//  -- *Set.multiadd([]string)
 //  -- *Set.remove(string) -> bool
 //  -- *Set.discard(string)
 //  -- *Set.pop() -> string
@@ -116,6 +118,16 @@ func (s Set) isMember(str string) bool {
  */
 func (s *Set) add(str string) {
 	(*s)[str] = true
+}
+
+/* *Set.multiadd([]string)
+/*
+/* Adds all members of []string parameter as members of the set.
+ */
+func (s *Set) multiadd(strs []string) {
+	for _, str := range strs {
+		s.add(str)
+	}
 }
 
 /* *Set.remove(string) -> bool

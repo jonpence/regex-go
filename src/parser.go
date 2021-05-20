@@ -1,4 +1,7 @@
-// TODO Make sure that the regex string contains only ASCII symbols.
+/* parser.go
+/*
+/* Implements a recursive descent parser for regular expressions.
+ */
 
 package main
 
@@ -10,13 +13,81 @@ type Parser struct {
 	token Token
 	lexer Lexer
 	depth int
-	graph Graph
+	nfa   *Automaton
+	debug bool
 }
 
+/* METHODS */
+//  -- initParser() -> Parser
+//  -- *Parser.setDebug()
+//  -- *Parser.unsetDebug()
+//  -- Parser.indent()
+//  -- Parser.enter(string)
+//  -- Parser.leave(string)
+//  -- Parser.require(Token) -> bool
+//  -- Parser.accept(Token) -> bool
+//  -- *Parser.parse(string) -> bool
+//  -- *Parser.parseS() -> int, int, bool
+//  -- *Parser.parseA() -> int, int, bool
+//  -- *Parser.parseB() -> int, int, bool
+//  -- *Parser.parseC() -> int, int, bool
+//  -- *Parser.parseD() -> int, int, bool
+//  -- *Parser.parseE() -> int, int, bool
+//  -- *Parser.parseF() -> int, int, bool
+//  -- *Parser.or(int, int, int, int) -> int, int
+//  -- *Parser.concatenate(int, int, int, int) -> int, int
+//  -- *Parser.kleene(int, int) -> int, int
+//  -- *Parser.symbol(string) -> int, int
+
+/* initParser() -> Parser
+/*
+ */
 func initParser() Parser {
-	return Parser{DEFAULT, initLexer(), 0, initGraph()}
+	return Parser{DEFAULT, initLexer(), 0, nil, false}
 }
 
+/* *Parser.setDebug()
+/*
+ */
+func (p *Parser) setDebug() {
+	p.debug = true
+}
+
+/* *Parser.unsetDebug()
+/*
+ */
+func (p *Parser) unsetDebug() {
+	p.debug = false
+}
+
+/* Parser.indent()
+/*
+ */
+func (p Parser) indent() {
+	for i := 0; i < p.depth; i += 1 {
+		fmt.Print(" ")
+	}
+}
+
+/* Parser.enter(string)
+/*
+ */
+func (p Parser) enter(nt string) {
+	p.indent()
+	fmt.Println("ENTERED: " + nt)
+}
+
+/* Parser.leave(string)
+/*
+ */
+func (p Parser) leave(nt string) {
+	p.indent()
+	fmt.Println("LEFT: " + nt)
+}
+
+/* Parser.require(Token) -> bool
+/*
+ */
 func (p Parser) require(expected Token) bool {
 	if p.token == expected {
 		return true
@@ -25,10 +96,15 @@ func (p Parser) require(expected Token) bool {
 	}
 }
 
+/* *Parser.accept(Token) -> bool
+/*
+ */
 func (p *Parser) accept(expected Token) bool {
 	if p.token == expected {
-		p.indent()
-		fmt.Printf("ACCEPTED %s\n", tokenStr(expected))
+		if p.debug {
+			p.indent()
+			fmt.Printf("ACCEPTED %s\n", tokenStr(expected))
+		}
 		p.token = p.lexer.nextToken()
 		return true
 	} else {
@@ -36,43 +112,55 @@ func (p *Parser) accept(expected Token) bool {
 	}
 }
 
-func (p Parser) indent() {
-	for i := 0; i < p.depth; i += 1 {
-		fmt.Print(" ")
-	}
-}
-
-func (p Parser) enter(nt string) {
-	p.indent()
-	fmt.Println("ENTERED: " + nt)
-}
-
-func (p Parser) leave(nt string) {
-	p.indent()
-	fmt.Println("LEFT: " + nt)
-}
-
+/* *Parser.parse(string) -> bool
+/*
+ */
 func (p *Parser) parse(input string) bool {
+	// init automaton
+	p.nfa = initAutomaton()
+
+	// set up lexer
 	p.lexer.storeInput(input)
 	p.token = p.lexer.nextToken()
 
-	var s_start int
+	// do parse
+	s_start, s_end, _ := p.parseS()
 
-	s_start, _, _ = p.parseS()
+	// if regex input terminates correctly
 	if p.accept(END) {
-		fmt.Printf("Valid parse with start state of %d\n", s_start)
-		p.graph.setStart(s_start)
-		p.graph.setTerminal(p.graph.findTerminal())
+		// debug statements
+		if p.debug {
+			fmt.Printf("Valid parse with start state of %d\n", s_start)
+		}
+
+		// set terminating state
+		p.nfa.getState(intToString(s_end)).setTerminates()
+
+		// set start
+		p.nfa.setStart(p.nfa.getState(intToString(s_start)))
+
+		// succesful parse
 		return true
 	} else {
-		fmt.Println("Invalid parse.")
+
+		// debug statements
+		if p.debug {
+			fmt.Println("Invalid parse.")
+		}
+
+		// unsuccessful parse
 		return false
 	}
 }
 
+/* *Parser.parseS() -> int, int, bool
+/*
+ */
 func (p *Parser) parseS() (int, int, bool) {
-	p.enter("S")
-	p.depth += 1
+	if p.debug {
+		p.enter("S")
+		p.depth += 1
+	}
 
 	var n_start, n_end int
 
@@ -88,8 +176,10 @@ func (p *Parser) parseS() (int, int, bool) {
 		return 0, 0, false
 	}
 
-	p.depth -= 1
-	p.leave("S")
+	if p.debug {
+		p.depth -= 1
+		p.leave("S")
+	}
 
 	if b_start != 0 {
 		n_start, n_end = p.or(a_start, b_start, a_end, b_end)
@@ -100,9 +190,14 @@ func (p *Parser) parseS() (int, int, bool) {
 	return n_start, n_end, true
 }
 
+/* *Parser.parseA() -> int, int, bool
+/*
+ */
 func (p *Parser) parseA() (int, int, bool) {
-	p.enter("A")
-	p.depth += 1
+	if p.debug {
+		p.enter("A")
+		p.depth += 1
+	}
 
 	var n_start, n_end int
 
@@ -124,15 +219,22 @@ func (p *Parser) parseA() (int, int, bool) {
 		n_start, n_end = c_start, c_end
 	}
 
-	p.depth -= 1
-	p.leave("A")
+	if p.debug {
+		p.depth -= 1
+		p.leave("A")
+	}
 
 	return n_start, n_end, true
 }
 
+/* *Parser.parseB() -> int, int, bool
+/*
+ */
 func (p *Parser) parseB() (int, int, bool) {
-	p.enter("B")
-	p.depth += 1
+	if p.debug {
+		p.enter("B")
+		p.depth += 1
+	}
 
 	var n_start, n_end int
 
@@ -161,15 +263,22 @@ func (p *Parser) parseB() (int, int, bool) {
 			n_start, n_end = 0, 0
 	}
 
-	p.depth -= 1
-	p.leave("B")
+	if p.debug {
+		p.depth -= 1
+		p.leave("B")
+	}
 
 	return n_start, n_end, true;
 }
 
+/* *Parser.parseC() -> int, int, bool
+/*
+ */
 func (p *Parser) parseC() (int, int, bool) {
-	p.enter("C")
-	p.depth += 1
+	if p.debug {
+		p.enter("C")
+		p.depth += 1
+	}
 
 	var n_start, n_end int
 
@@ -191,15 +300,22 @@ func (p *Parser) parseC() (int, int, bool) {
 		n_start, n_end = e_start, e_end
 	}
 
-	p.depth -= 1
-	p.leave("C")
+	if p.debug {
+		p.depth -= 1
+		p.leave("C")
+	}
 
 	return n_start, n_end, true;
 }
 
+/* *Parser.parseD() -> int, int, bool
+/*
+ */
 func (p *Parser) parseD() (int, int, bool) {
-	p.enter("D")
-	p.depth += 1
+	if p.debug {
+		p.enter("D")
+		p.depth += 1
+	}
 
 	var n_start, n_end int
 
@@ -227,15 +343,22 @@ func (p *Parser) parseD() (int, int, bool) {
 			n_start, n_end = 0, 0
 	}
 
-	p.depth -= 1
-	p.leave("D")
+	if p.debug {
+		p.depth -= 1
+		p.leave("D")
+	}
 
 	return n_start, n_end, true;
 }
 
+/* *Parser.parseE() -> int, int, bool
+/*
+ */
 func (p *Parser) parseE() (int, int, bool) {
-	p.enter("E")
-	p.depth += 1
+	if p.debug {
+		p.enter("E")
+		p.depth += 1
+	}
 
 	var n_start, n_end int
 
@@ -259,15 +382,22 @@ func (p *Parser) parseE() (int, int, bool) {
 			return 0, 0, false
 	}
 
-	p.depth -= 1
-	p.leave("E")
+	if p.debug {
+		p.depth -= 1
+		p.leave("E")
+	}
 
 	return n_start, n_end, true;
 }
 
+/* *Parser.parseF() -> int, int, bool
+/*
+ */
 func (p *Parser) parseF() (int, int, bool) {
-	p.enter("F")
-	p.depth += 1
+	if p.debug {
+		p.enter("F")
+		p.depth += 1
+	}
 
 	var n_start, n_end int
 
@@ -281,61 +411,84 @@ func (p *Parser) parseF() (int, int, bool) {
 			n_start, n_end = -1, -1
 	}
 
-	p.depth -= 1
-	p.leave("F")
+	if p.debug {
+		p.depth -= 1
+		p.leave("F")
+	}
 
 	return n_start, n_end, true;
 }
 
 
+/* *Parser.or(int, int, int, int) -> int, int
+/*
+ */
 func (p *Parser) or(startA int, startB int, endA int, endB int) (int, int) {
-	fmt.Println("ADDING OR")
-	origCount := p.graph.count
+	if p.debug {
+		fmt.Println("ADDING OR")
+	}
 
-	p.graph.addNode()
-	p.graph.addNode()
-	p.graph.addNode()
-	p.graph.addNode()
+	currentCount := p.nfa.getCount()
 
-	p.graph.addEdge(origCount + 1, origCount + 2, "")
-	p.graph.addEdge(origCount + 3, origCount + 4, "")
-	p.graph.addEdge(origCount + 2, startA, "")
-	p.graph.addEdge(origCount + 2, startB, "")
-	p.graph.addEdge(endA, origCount + 3, "")
-	p.graph.addEdge(endB, origCount + 3, "")
+	ns0 := initNFAState(intToString(currentCount))
+	ns1 := initNFAState(intToString(currentCount + 1))
+	ns2 := initNFAState(intToString(currentCount + 2))
+	ns3 := initNFAState(intToString(currentCount + 3))
 
-	return origCount + 1, origCount + 4
+	p.nfa.addEdge(ns0.name, ns1.name, "")
+	p.nfa.addEdge(ns2.name, ns3.name, "")
+	p.nfa.addEdge(ns1.name, intToString(startA), "")
+	p.nfa.addEdge(ns1.name, intToString(startB), "")
+	p.nfa.addEdge(intToString(endA), ns2.name, "")
+	p.nfa.addEdge(intToString(endB), ns2.name, "")
+
+	return currentCount, currentCount + 3
 }
 
+/* *Parser.concatenate(int, int, int, int) -> int, int
+/*
+ */
 func (p *Parser) concatenate(startA int, startB int, endA int, endB int) (int, int) {
-	fmt.Println("ADDING CONCATENATE")
-	p.graph.addEdge(endA, startB, "")
+	if p.debug {
+		fmt.Println("ADDING CONCATENATE")
+	}
+	p.nfa.addEdge(intToString(endA), intToString(startB), "")
 	return startA, endB
 }
 
+/* *Parser.kleene(int, int) -> int, int
+/*
+ */
 func (p *Parser) kleene(startA int, endA int) (int, int) {
-	fmt.Println("ADDING KLEENE")
-	origCount := p.graph.count
+	if p.debug {
+		fmt.Println("ADDING KLEENE")
+	}
+	currentCount := p.nfa.getCount()
 
-	p.graph.addNode()
-	p.graph.addNode()
+	ns0 := initNFAState(intToString(currentCount))
+	ns1 := initNFAState(intToString(currentCount + 1))
 
-	p.graph.addEdge(origCount + 1, origCount + 2, "")
-	p.graph.addEdge(origCount + 1, startA, "")
-	p.graph.addEdge(endA, origCount + 1, "")
-	p.graph.addEdge(endA, origCount + 2, "")
+	p.nfa.addEdge(ns0.name, ns1.name, "")
+	p.nfa.addEdge(ns0.name, intToString(startA), "")
+	p.nfa.addEdge(intToString(endA), ns0.name, "")
+	p.nfa.addEdge(intToString(endA), ns1.name, "")
 
-	return origCount + 1, origCount + 2
+	return currentCount , currentCount + 1
 }
 
+/* *Parser.symbol(string) -> int, int
+/*
+ */
 func (p *Parser) symbol(symbol string) (int, int) {
-	fmt.Println("ADDING SYMBOL")
-	origCount := p.graph.count
+	if p.debug {
+		fmt.Println("ADDING SYMBOL")
+	}
+	currentCount := p.nfa.getCount()
 
-	p.graph.addNode()
-	p.graph.addNode()
+	ns0 := initNFAState(intToString(currentCount))
+	ns1 := initNFAState(intToString(currentCount + 1))
 
-	p.graph.addEdge(origCount + 1, origCount + 2, symbol)
+	p.nfa.addEdge(ns0.name, ns1.name, symbol)
 
-	return origCount + 1, origCount + 2
+	return currentCount, currentCount + 1
 }
