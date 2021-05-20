@@ -5,7 +5,7 @@ import (
 )
 
 func TestInitSet(t *testing.T) {
-	testSet := initSet()
+	testSet := InitSet()
 
 	if testSet == nil {
 		t.Errorf("testSet is nil, expected non-nil value")
@@ -14,309 +14,309 @@ func TestInitSet(t *testing.T) {
 
 func TestInitSetElements(t *testing.T) {
 	testSlice := []string{"0", "1", "2", "3", "4"}
-	testSet   := initSetElements(testSlice)
+	testSet   := InitSetElements(testSlice)
 
-	if !testSet.isMember("0") {
+	if !testSet.IsMember("0") {
 		t.Errorf("expected testSet to contain 0")
 	}
 
-	if !testSet.isMember("1") {
+	if !testSet.IsMember("1") {
 		t.Errorf("expected testSet to contain 1")
 	}
 
-	if !testSet.isMember("2") {
+	if !testSet.IsMember("2") {
 		t.Errorf("expected testSet to contain 2")
 	}
 
-	if !testSet.isMember("3") {
+	if !testSet.IsMember("3") {
 		t.Errorf("expected testSet to contain 3")
 	}
 
-	if !testSet.isMember("4") {
+	if !testSet.IsMember("4") {
 		t.Errorf("expected testSet to contain 4")
 	}
 }
 
 func TestSize(t *testing.T) {
 	testSlice := []string{"0", "1", "2", "3", "4"}
-	testSet   := initSetElements(testSlice)
+	testSet   := InitSetElements(testSlice)
 
-	if testSet.size() != 5 {
-		t.Errorf("testSize size is %d, expected 5", testSet.size())
+	if testSet.Size() != 5 {
+		t.Errorf("testSize size is %d, expected 5", testSet.Size())
 	}
 }
 
 func TestInitSetRange(t *testing.T) {
-	testSet := initSetRange(0, 5)
+	testSet := InitSetRange(0, 5)
 
-	if !testSet.isMember("0") {
+	if !testSet.IsMember("0") {
 		t.Errorf("expected testSet to contain 0")
 	}
 
-	if !testSet.isMember("1") {
+	if !testSet.IsMember("1") {
 		t.Errorf("expected testSet to contain 1")
 	}
 
-	if !testSet.isMember("2") {
+	if !testSet.IsMember("2") {
 		t.Errorf("expected testSet to contain 2")
 	}
 
-	if !testSet.isMember("3") {
+	if !testSet.IsMember("3") {
 		t.Errorf("expected testSet to contain 3")
 	}
 
-	if !testSet.isMember("4") {
+	if !testSet.IsMember("4") {
 		t.Errorf("expected testSet to contain 4")
 	}
 
-	if testSet.isMember("5") {
+	if testSet.IsMember("5") {
 		t.Errorf("did not expect testSet to contain 5")
 	}
 }
 
 func TestIsMember(t *testing.T) {
-	testSet := initSetElements([]string{"0"})
+	testSet := InitSetElements([]string{"0"})
 
-	if !testSet.isMember("0") {
-		t.Errorf("expected isMember() to report that 0 is a member of testSet")
+	if !testSet.IsMember("0") {
+		t.Errorf("expected IsMember() to report that 0 is a member of testSet")
 	}
 }
 
 func TestAdd(t *testing.T) {
-	testSet := initSet()
-	testSet.add("0")
+	testSet := InitSet()
+	testSet.Add("0")
 
-	if !testSet.isMember("0") {
-		t.Errorf("expected isMember() to report that 0 is a member of testSet")
+	if !testSet.IsMember("0") {
+		t.Errorf("expected IsMember() to report that 0 is a member of testSet")
 	}
 }
 
 func TestMultiadd(t *testing.T) {
 	testSlice := []string{"0", "1", "2", "3", "4"}
-	testSet   := initSet()
+	testSet   := InitSet()
 
-	testSet.multiadd(testSlice)
+	testSet.Multiadd(testSlice)
 
-	if !testSet.isMember("0") {
+	if !testSet.IsMember("0") {
 		t.Errorf("expected testSet to contain 0")
 	}
 
-	if !testSet.isMember("1") {
+	if !testSet.IsMember("1") {
 		t.Errorf("expected testSet to contain 1")
 	}
 
-	if !testSet.isMember("2") {
+	if !testSet.IsMember("2") {
 		t.Errorf("expected testSet to contain 2")
 	}
 
-	if !testSet.isMember("3") {
+	if !testSet.IsMember("3") {
 		t.Errorf("expected testSet to contain 3")
 	}
 
-	if !testSet.isMember("4") {
+	if !testSet.IsMember("4") {
 		t.Errorf("expected testSet to contain 4")
 	}
 }
 
 func TestRemove(t *testing.T) {
-	testSet := initSet()
-	testSet.add("0")
+	testSet := InitSet()
+	testSet.Add("0")
 
-	if !testSet.remove("0") {
+	if !testSet.Remove("0") {
 		t.Errorf("expected return value of true since 0 is element of testSet")
 	}
 
-	if testSet.remove("1") {
+	if testSet.Remove("1") {
 		t.Errorf("expected return value of false since 1 is not an element of testSet")
 	}
 }
 
 func TestDiscard(t *testing.T) {
-	testSet := initSet()
-	testSet.add("0")
+	testSet := InitSet()
+	testSet.Add("0")
 
-	testSet.discard("0")
-	testSet.discard("1")
+	testSet.Discard("0")
+	testSet.Discard("1")
 
-	if testSet.isMember("0") {
-		t.Errorf("expected false as 0 is discarded")
+	if testSet.IsMember("0") {
+		t.Errorf("expected false as 0 is Discarded")
 	}
 
-	if testSet.isMember("1") {
-		t.Errorf("expected false as 1 is discarded and was never a member of testSet")
+	if testSet.IsMember("1") {
+		t.Errorf("expected false as 1 is Discarded and was never a member of testSet")
 	}
 }
 
 func TestPop(t *testing.T) {
-	testSet := initSetRange(1, 11)
+	testSet := InitSetRange(1, 11)
 
-	for _, ok := testSet.pop(); ok; _, ok = testSet.pop() { }
+	for _, ok := testSet.Pop(); ok; _, ok = testSet.Pop() { }
 
-	if !testSet.isEmpty() {
+	if !testSet.IsEmpty() {
 		t.Errorf("expected testSet to be empty")
 	}
 }
 
 func TestClear(t *testing.T) {
-	testSet := initSetRange(0, 101)
+	testSet := InitSetRange(0, 101)
 
-	testSet.clear()
+	testSet.Clear()
 
-	if !testSet.isEmpty() {
+	if !testSet.IsEmpty() {
 		t.Errorf("expected testSet to be empty")
 	}
 }
 
 func TestCopy(t *testing.T) {
-	testSetA := initSetRange(0, 11)
-	testSetB := testSetA.copy()
+	testSetA := InitSetRange(0, 11)
+	testSetB := testSetA.Copy()
 
-	if !testSetA.equivalent(testSetB) {
-		t.Errorf("expected testSetA to be equivalent with testSetB")
+	if !testSetA.Equivalent(testSetB) {
+		t.Errorf("expected testSetA to be Equivalent with testSetB")
 	}
 }
 
 func TestIntersection(t *testing.T) {
-	testSetA := initSetRange(1, 11)
-	testSetB := initSetRange(5, 16)
-	testSetC := testSetA.intersection(testSetB)
-	testSetD := initSetRange(5, 11)
+	testSetA := InitSetRange(1, 11)
+	testSetB := InitSetRange(5, 16)
+	testSetC := testSetA.Intersection(testSetB)
+	testSetD := InitSetRange(5, 11)
 
-	if !testSetC.equivalent(testSetD) {
+	if !testSetC.Equivalent(testSetD) {
 		t.Errorf("expected intersection to contain 5 to 10 inclusive")
 	}
 }
 
 func TestSubset(t *testing.T) {
-	testSetA := initSetRange(0, 11)
-	testSetB := initSetRange(0, 11)
-	testSetC := initSetRange(3, 6)
+	testSetA := InitSetRange(0, 11)
+	testSetB := InitSetRange(0, 11)
+	testSetC := InitSetRange(3, 6)
 
-	if !testSetA.subset(testSetB) {
-		t.Errorf("expected testSetA to be subset of testSetB")
+	if !testSetA.Subset(testSetB) {
+		t.Errorf("expected testSetA to be Subset of testSetB")
 	}
 
-	if !testSetC.subset(testSetA) {
+	if !testSetC.Subset(testSetA) {
 		t.Errorf("expected testSetC to be subset of testSetA")
 	}
 }
 
 func TestSuperset(t *testing.T) {
-	testSetA := initSetRange(0, 11)
-	testSetB := initSetRange(0, 11)
-	testSetC := initSetRange(3, 6)
+	testSetA := InitSetRange(0, 11)
+	testSetB := InitSetRange(0, 11)
+	testSetC := InitSetRange(3, 6)
 
-	if !testSetA.superset(testSetB) {
+	if !testSetA.Superset(testSetB) {
 		t.Errorf("expected testSetA to be superset of testSetB")
 	}
 
-	if !testSetA.superset(testSetC) {
+	if !testSetA.Superset(testSetC) {
 		t.Errorf("expected testSetA to be superset of testSetC")
 	}
 }
 
 func TestProperSubset(t *testing.T) {
-	testSetA := initSetRange(0, 11)
-	testSetB := initSetRange(0, 11)
-	testSetC := initSetRange(3, 6)
+	testSetA := InitSetRange(0, 11)
+	testSetB := InitSetRange(0, 11)
+	testSetC := InitSetRange(3, 6)
 
-	if testSetA.properSubset(testSetB) {
+	if testSetA.ProperSubset(testSetB) {
 		t.Errorf("did not expect testSetA to be proper subset of testSetB")
 	}
 
-	if !testSetC.properSubset(testSetA) {
+	if !testSetC.ProperSubset(testSetA) {
 		t.Errorf("expected testSetC to be subset of testSetA")
 	}
 }
 
 func TestProperSuperset(t *testing.T) {
-	testSetA := initSetRange(0, 11)
-	testSetB := initSetRange(0, 11)
-	testSetC := initSetRange(3, 6)
+	testSetA := InitSetRange(0, 11)
+	testSetB := InitSetRange(0, 11)
+	testSetC := InitSetRange(3, 6)
 
-	if testSetA.properSuperset(testSetB) {
+	if testSetA.ProperSuperset(testSetB) {
 		t.Errorf("did not expect for testSetA to be proper superset of testSetB")
 	}
 
-	if !testSetA.properSuperset(testSetC) {
+	if !testSetA.ProperSuperset(testSetC) {
 		t.Errorf("expected testSetA to be proper superset of testSetC")
 	}
 }
 
 func TestEquivalent(t *testing.T) {
-	testSetA := initSetRange(0, 101)
-	testSetB := initSetRange(0, 101)
-	testSetC := initSetRange(1, 100)
-	testSetD := initSetRange(200, 301)
+	testSetA := InitSetRange(0, 101)
+	testSetB := InitSetRange(0, 101)
+	testSetC := InitSetRange(1, 100)
+	testSetD := InitSetRange(200, 301)
 
-	if !testSetA.equivalent(testSetB) {
+	if !testSetA.Equivalent(testSetB) {
 		t.Errorf("expected testSetA to be equivalent with testSetB")
 	}
 
-	if testSetA.equivalent(testSetC) {
+	if testSetA.Equivalent(testSetC) {
 		t.Errorf("did not expect testSetA to be equivalent with testSetC")
 	}
 
-	if testSetA.equivalent(testSetD) {
+	if testSetA.Equivalent(testSetD) {
 		t.Errorf("did not expect testSetA to be equivalent with testSetD")
 	}
 }
 
 func TestDifference(t *testing.T) {
-	testSetA := initSetRange(1, 21)
-	testSetB := initSetRange(1, 10)
-	testSetC := initSetRange(10, 21)
+	testSetA := InitSetRange(1, 21)
+	testSetB := InitSetRange(1, 10)
+	testSetC := InitSetRange(10, 21)
 
-	if !testSetC.equivalent(testSetA.difference(testSetB)) {
-		t.Errorf("expected testSetC to be equivalent with testSetA - testSetB, instead:\n\ttestSetC is \n\t\t%s\n\ttestSetA - testSetB is\n\t\t%s", testSetC.toString(), testSetA.difference(testSetB).toString())
+	if !testSetC.Equivalent(testSetA.Difference(testSetB)) {
+		t.Errorf("expected testSetC to be equivalent with testSetA - testSetB, instead:\n\ttestSetC is \n\t\t%s\n\ttestSetA - testSetB is\n\t\t%s", testSetC.ToString(), testSetA.Difference(testSetB).ToString())
 	}
 }
 
 func TestUnion(t *testing.T) {
-	testSetA := initSetRange(1, 11)
-	testSetB := initSetRange(11, 21)
-	testSetC := initSetRange(1, 21)
+	testSetA := InitSetRange(1, 11)
+	testSetB := InitSetRange(11, 21)
+	testSetC := InitSetRange(1, 21)
 
-	if !testSetC.equivalent(testSetA.union(testSetB)) {
-		t.Errorf("expected testSetC to be equivalent with testSetA U testSetB")
+	if !testSetC.Equivalent(testSetA.Union(testSetB)) {
+		t.Errorf("expected testSetC to be Equivalent with testSetA U testSetB")
 	}
 }
 
 func TestSymmetricDifference(t *testing.T) {
-	testSetA := initSetRange(1, 16)
-	testSetB := initSetRange(10, 21)
+	testSetA := InitSetRange(1, 16)
+	testSetB := InitSetRange(10, 21)
 
 	testSlice := []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "16", "17", "18", "19", "20"}
-	testSetC  := initSetElements(testSlice)
+	testSetC  := InitSetElements(testSlice)
 
-	if !testSetC.equivalent(testSetA.symmetricDifference(testSetB)) {
-		t.Errorf("Expected testSetC to be equivalent with symmetric difference of testSetA and testSetB")
+	if !testSetC.Equivalent(testSetA.SymmetricDifference(testSetB)) {
+		t.Errorf("Expected testSetC to be Equivalent with Symmetric Difference of testSetA and testSetB")
 	}
 }
 
 func TestDisjoint(t *testing.T) {
-	testSetA := initSetRange(1, 11)
-	testSetB := initSetRange(5, 21)
-	testSetC := initSetRange(15, 30)
+	testSetA := InitSetRange(1, 11)
+	testSetB := InitSetRange(5, 21)
+	testSetC := InitSetRange(15, 30)
 
-	if testSetA.disjoint(testSetB) {
-		t.Errorf("did not expect testSetA to be disjoint from testSetB")
+	if testSetA.Disjoint(testSetB) {
+		t.Errorf("did not expect testSetA to be Disjoint from testSetB")
 	}
 
-	if testSetB.disjoint(testSetC) {
-		t.Errorf("did not expect testSetB to be disjoint from testSetA")
+	if testSetB.Disjoint(testSetC) {
+		t.Errorf("did not expect testSetB to be Disjoint from testSetA")
 	}
 
-	if !testSetA.disjoint(testSetC) {
-		t.Errorf("expected testSetA to be disjoint from testSetC")
+	if !testSetA.Disjoint(testSetC) {
+		t.Errorf("expected testSetA to be Disjoint from testSetC")
 	}
 }
 
 func TestToString(t *testing.T) {
 	testString := "{1, 2, 3, 4, 5, 6}"
-	testSet   := initSetRange(1, 7)
+	testSet   := InitSetRange(1, 7)
 
-	if testString != testSet.toString() {
-		t.Errorf("expeted testSet's string to be %s, instead testSet is %s", testString, testSet.toString())
+	if testString != testSet.ToString() {
+		t.Errorf("expected testSet's string to be %s, instead testSet is %s", testString, testSet.ToString())
 	}
 }
