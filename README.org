@@ -2,24 +2,28 @@
 
 A regular expressions engine written in Go.
 
-The commit corresponding to this README file contains code which is functional for at least some test cases. More testing
-needs to be done in order to validate program correctness. Furthermore, refactoring needs to be performed in order to clean up the code. Finally, comments and other
-extraneous documentation needs to be performed.
-
 ** TO-DO
-1. Implement actual usage functionality.
-2. Refactor code.
-3. Comment and document code.
-4. Write unit tests.
-5. Rewrite README.
-6. Move IntToString() from Set.go to some etc.go
+0. Fix Makefile.
+1. Unit test:
+  * parser
+  * automaton
+  * regex
+  * program
+2. Test exhaustively with long regular expressions and edge case regular expressions.
+3. Refactor and clean up code.
+4. Comment code.
+5. Improve terminal user interface.
+6. Document usage/implementation details/motivation in README.
+7. Add support for '+' and '?' operators.
+8. Add implicit concatenation (i.e. remove necessity of explicit concatenation operator for concatenation to occur).
+
 ** Usage
 
 *** How to Build
-- TBD
+- ~make build~
 
 *** Execution
-- ./main
+- ~./rego~
 - A menu will appear. You can add new regular expressions, delete them, or use them to validate strings.
 - Regular expressions can be composed using the following operands/operators:
   + Any symbol can be an operand.
