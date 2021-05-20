@@ -4,9 +4,9 @@ A regular expressions engine written in Go.
 
 ** TO-DO
 0. [X] Fix Makefile.
-1. Unit test: [0%]
-  * [-] parser
-  * [ ] automaton
+1. Unit test: [25%]
+  * [X] parser
+  * [-] automaton
   * [ ] regex
   * [ ] program
 2. [ ] Test exhaustively with long regular expressions and edge case regular expressions.
@@ -47,12 +47,12 @@ The following LL(1) grammar will be used to recursively parse regular expression
 
 #+BEGIN_SRC
 S → A B
-B → '|' A B | ε
 A → C D
-D → '.' C D | ε
+B → '|' A B | ε
 C → E F
-F → '*' F | ε
+D → '.' C D | ε
 E → letter | 'ε' | '(' S ')'
+F → '*' F | ε
 #+END_SRC
 
 *** NFA Construction
@@ -62,11 +62,21 @@ E → letter | 'ε' | '(' S ')'
 - See parser.go for implementation.
 
 *** NFA to DFA Conversion
-- Start at the start state of the NFA, create a set of states reachable using only null-transitions. Call this the initial state of the DFA.
+- Start at the start state of the NFA, find the null-closure. Call this the initial state of the DFA.
 - We will have a queue of DFA states and a set of DFA states so we can avoid repetitions.
 - Now, we will iterate over all symbols of the NFA's alphabet. Each iteration we will produce a new state of the DFA as follows: Looking at each composite state of
   the DFA state, find the state(s) which are reachable by transitioning on whatever symbol we're iterating over. Add those states to a set, and call this set a
   new state of the DFA. Finally, check to see if any composite state of the new DFA state is the terminus of the NFA. If so, mark the new DFA state as terminating.
-- Each time we find a new state of the DFA, check to see if we've seen it before. If we haven't add it to the set and enqueue it.
-- Repeatedly perform the above process on DFA states which are dequeued from the set. Once the queue is empty and no new states are added, the construction is
+- Each time we find a new state of the DFA, check to see if we've seen it before. If we haven't, add it to the set and enqueue it.
+- Repeatedly perform the above process on dequeued DFA states. Once the queue is empty and no new states are added, the construction is
   complete.
+
+*** '+' and '?' operators
+- The '+' operator is equivalent to the regex "A.A*" and reads as "one or more of A" where A is some arbitrary symbol.
+- The '?' operator is equivalent to the regex "A|ε" and reads as "zero or one of A" where A is some arbitrary symbol.
+
+*** String validation
+- Take some string. We will iterate over its characters and use those characters as input to the DFA.
+- Start at the 0th character. Start at the DFA's start state. Feed the DFA the 0th character. If there is a transition out of the initial DFA state on the 0th character, make the transition and move to the next iteration.
+- Repeat this until all characters of the input string are used up. If, upon reaching the end of the input string, our current DFA state is a terminating state, then
+  accept. Otherwise reject.
