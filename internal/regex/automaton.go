@@ -5,23 +5,11 @@ import (
 	"github.com/jonpence/regex-go/internal/deque"
 )
 
-// AUTOMATON METHODS
-// initAutomaton
-// addState
-// addEdge
-// setStart
-// setCurrent
-// reset
-// transition
-// convertFrom
-// validate
-
-/* AUTOMATON */
-
 type Automaton struct {
 	states  map[string]*State
 	start   *State
 	current *State
+
 	inputs  set.Set
 	count   int
 }
@@ -132,12 +120,11 @@ func (a *Automaton) determinize() *Automaton {
 
 		for input := range a.inputs {
 			newState := a.closureOfOn(dfa.getState(currentState), input)
-
 			if newState.name == "{}" {
 				continue
 			}
 
-			if _, present := a.states[newState.name]; !present {
+			if _, present := dfa.states[newState.name]; !present {
 				dfa.addState(newState)
 				queue.Enqueue(newState.name)
 			}

@@ -311,12 +311,3 @@ func TestDisjoint(t *testing.T) {
 		t.Errorf("expected testSetA to be Disjoint from testSetC")
 	}
 }
-
-func TestToString(t *testing.T) {
-	testString := "{1, 2, 3, 4, 5, 6}"
-	testSet   := InitSetRange(1, 7)
-
-	if testString != testSet.ToString() {
-		t.Errorf("expected testSet's string to be %s, instead testSet is %s", testString, testSet.ToString())
-	}
-}

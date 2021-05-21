@@ -3,19 +3,18 @@
 A regular expressions engine written in Go.
 
 ** TO-DO
-0. [X] Fix Makefile.
-1. Unit test: [25%]
-  * [X] parser
-  * [-] automaton
-  * [ ] regex
-  * [ ] program
-2. [ ] Test exhaustively with long regular expressions and edge case regular expressions.
-3. [ ] Refactor and clean up code.
-4. [ ] Comment code.
-5. [ ] Improve terminal user interface.
-6. [ ] Document usage/implementation details/motivation in README.
-7. [ ] Add support for '+' and '?' operators.
-8. [ ] Add implicit concatenation (i.e. remove need for explicit concatenation operator in regular expression).
+1. [X] Fix Makefile.
+2. Unit test: [100%]
+   * [X] parser
+   * [X] automaton
+   * [X] regex
+3. [ ] Test exhaustively with long regular expressions and edge case regular expressions.
+4. [ ] Refactor and clean up code.
+5. [ ] Comment code.
+6. [ ] Improve terminal user interface.
+7. [ ] Document usage/implementation details/motivation in README.
+8. [ ] Add support for '+' and '?' operators.
+9. [ ] Add implicit concatenation (i.e. remove need for explicit concatenation operator in regular expression).
 
 ** Usage
 

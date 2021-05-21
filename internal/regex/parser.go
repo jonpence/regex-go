@@ -7,6 +7,7 @@ package regex
 
 import (
 	"fmt"
+	"github.com/jonpence/regex-go/internal/set"
 )
 
 type Parser struct {
@@ -443,10 +444,22 @@ func (p *Parser) or(startA int, startB int, endA int, endB int) (int, int) {
 	n2 := itos(currentCount + 2)
 	n3 := itos(currentCount + 3)
 
-	p.nfa.addState(initNFAState(n0))
-	p.nfa.addState(initNFAState(n1))
-	p.nfa.addState(initNFAState(n2))
-	p.nfa.addState(initNFAState(n3))
+	ns0 := initNFAState(n0)
+	ns0.composites = set.InitSetElements([]string{n0})
+
+	ns1 := initNFAState(n1)
+	ns1.composites = set.InitSetElements([]string{n1})
+
+	ns2 := initNFAState(n2)
+	ns2.composites = set.InitSetElements([]string{n2})
+
+	ns3 := initNFAState(n3)
+	ns3.composites = set.InitSetElements([]string{n3})
+
+	p.nfa.addState(ns0)
+	p.nfa.addState(ns1)
+	p.nfa.addState(ns2)
+	p.nfa.addState(ns3)
 
 	p.nfa.addEdge(n0, n1, "")
 	p.nfa.addEdge(n2, n3, "")
@@ -483,8 +496,14 @@ func (p *Parser) kleene(startA int, endA int) (int, int) {
 	n0 := itos(currentCount)
 	n1 := itos(currentCount + 1)
 
-	p.nfa.addState(initNFAState(n0))
-	p.nfa.addState(initNFAState(n1))
+	ns0 := initNFAState(n0)
+	ns0.composites = set.InitSetElements([]string{n0})
+
+	ns1 := initNFAState(n1)
+	ns1.composites = set.InitSetElements([]string{n1})
+
+	p.nfa.addState(ns0)
+	p.nfa.addState(ns1)
 
 	p.nfa.addEdge(n0, n1, "")
 	p.nfa.addEdge(n0, itos(startA), "")
@@ -506,10 +525,17 @@ func (p *Parser) symbol(symbol string) (int, int) {
 	n0 := itos(currentCount)
 	n1 := itos(currentCount + 1)
 
-	p.nfa.addState(initNFAState(n0))
-	p.nfa.addState(initNFAState(n1))
+	ns0 := initNFAState(n0)
+	ns0.composites = set.InitSetElements([]string{n0})
+
+	ns1 := initNFAState(n1)
+	ns1.composites = set.InitSetElements([]string{n1})
+
+	p.nfa.addState(ns0)
+	p.nfa.addState(ns1)
 
 	p.nfa.addEdge(n0, n1, symbol)
+	p.nfa.inputs.Add(symbol)
 
 	return currentCount, currentCount + 1
 }

@@ -4,14 +4,15 @@ type Regex struct {
 	expression string
 	compiled   bool
 	dfa        *Automaton
+	parser     *Parser
 }
 
-func initRegex() Regex {
-	return Regex{"", false, initAutomaton()}
+func initRegex(parser *Parser) Regex {
+	return Regex{"", false, initAutomaton(), parser}
 }
 
-func newRegex(input string) (Regex, bool) {
-	r := initRegex()
+func newRegex(input string, parser *Parser) (Regex, bool) {
+	r := initRegex(parser)
 
 	r.setExpression(input)
 
@@ -32,17 +33,11 @@ func (r *Regex) setAutomaton(dfa *Automaton) {
 }
 
 func (r *Regex) compile() bool {
-	p := initParser()
-
-	if !p.parse(r.expression) {
+	if !r.parser.parse(r.expression) {
 		return false
 	}
 
-	for _, state := range p.nfa.states {
-		state.printNFAState()
-	}
-
-	r.dfa = p.nfa.determinize()
+	r.dfa = r.parser.nfa.determinize()
 	r.compiled = true
 
 	return true
