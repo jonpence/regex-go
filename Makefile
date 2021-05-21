@@ -1,5 +1,5 @@
 build: cmd/*/*.go internal/*/*.go
-	go build cmd/rego/*.go
+	go build -o rego cmd/rego/*.go
 
 run: build
 	./rego

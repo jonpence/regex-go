@@ -11,12 +11,13 @@ import (
 
 type Program struct {
 	regex     []regex.Regex
+	parser    *regex.Parser
 	reader    *bufio.Reader
 	running   bool
 }
 
 func initProgram() Program {
-	return Program{[]regex.Regex{}, bufio.NewReader(os.Stdin), true}
+	return Program{[]regex.Regex{}, regex.InitParser(), bufio.NewReader(os.Stdin), true}
 }
 
 func (p Program) readInput() (string, bool) {
@@ -65,7 +66,7 @@ func (p *Program) addRegex() {
 		return
 	}
 
-	newRegex, ok := newRegex(expression)
+	newRegex, ok := regex.NewRegex(expression, p.parser)
 
 	if !ok {
 		log.Println("Unable to create new regex. Try again.")
@@ -76,8 +77,8 @@ func (p *Program) addRegex() {
 }
 
 func (p Program) listRegex() {
-	for i, regex := range p.regex {
-		fmt.Printf("%d. %s \n", i, regex.expression)
+	for i, regexpr := range p.regex {
+		fmt.Printf("%d. %s \n", i, regexpr.Expression())
 	}
 }
 
@@ -111,7 +112,7 @@ func (p Program) validateString() {
 		return
 	}
 
-	if p.regex[stringToInt(number)].validate(input) {
+	if p.regex[stringToInt(number)].Validate(input) {
 		fmt.Println("Valid.")
 	} else {
 		fmt.Println("Invalid.")

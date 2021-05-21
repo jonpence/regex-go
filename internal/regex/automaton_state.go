@@ -27,8 +27,8 @@ func initNFAState(name string) *State {
 	return &State{name, make(map[string][]string), set.InitSet(), false, false}
 }
 
-func initDFAState(composites set.Set) *State {
-	return &State{composites.ToString(), make(map[string][]string), composites, false, true}
+func initDFAState(composites set.Set, name string) *State {
+	return &State{name, make(map[string][]string), composites, false, true}
 }
 
 func (s *State) addNeighbor(dest string, input string) {

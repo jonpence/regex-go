@@ -1,5 +1,7 @@
 #+TITLE: go-regex
 
+STATUS: broken af
+
 A regular expressions engine written in Go.
 
 ** TO-DO
@@ -8,13 +10,14 @@ A regular expressions engine written in Go.
    * [X] parser
    * [X] automaton
    * [X] regex
-3. [ ] Test exhaustively with long regular expressions and edge case regular expressions.
-4. [ ] Refactor and clean up code.
-5. [ ] Comment code.
-6. [ ] Improve terminal user interface.
-7. [ ] Document usage/implementation details/motivation in README.
-8. [ ] Add support for '+' and '?' operators.
-9. [ ] Add implicit concatenation (i.e. remove need for explicit concatenation operator in regular expression).
+3. [ ] Implement naming of DFA states using n-tuple pairing function.
+4. [ ] Test exhaustively with long regular expressions and edge case regular expressions.
+5. [ ] Refactor and clean up code.
+6. [ ] Comment code.
+7. [ ] Improve terminal user interface.
+8. [ ] Document usage/implementation details/motivation in README.
+9. [ ] Add support for '+' and '?' operators.
+10. [ ] Add implicit concatenation (i.e. remove need for explicit concatenation operator in regular expression).
 
 ** Usage
 

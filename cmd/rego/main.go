@@ -10,7 +10,6 @@ import (
 func main() {
 
 	p := initProgram()
-
 	p.run()
 
 	fmt.Println("Exiting...")

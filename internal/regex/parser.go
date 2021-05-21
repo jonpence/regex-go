@@ -51,8 +51,8 @@ func itos(num int) string {
 /* initParser() -> Parser
 /*
  */
-func initParser() Parser {
-	return Parser{DEFAULT, initLexer(), 0, nil, false}
+func InitParser() *Parser {
+	return &Parser{DEFAULT, initLexer(), 0, nil, false}
 }
 
 /* *Parser.setDebug()
@@ -147,6 +147,11 @@ func (p *Parser) parse(input string) bool {
 
 		// set start
 		p.nfa.setStart(p.nfa.getState(itos(s_start)))
+
+		// TODO REMOVE
+		for state := range p.nfa.states {
+			p.nfa.getState(state).printNFAState()
+		}
 
 		// succesful parse
 		return true

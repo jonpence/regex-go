@@ -1,21 +1,20 @@
 package regex
 
 import (
+	"math"
 	"github.com/jonpence/regex-go/internal/set"
-	"github.com/jonpence/regex-go/internal/deque"
-)
+	"github.com/jonpence/regex-go/internal/deque")
 
 type Automaton struct {
 	states  map[string]*State
 	start   *State
 	current *State
-
 	inputs  set.Set
 	count   int
 }
 
 func initAutomaton() *Automaton {
-	return &Automaton{make(map[string]*State), nil, nil, set.InitSet(), 0}
+	return &Automaton{make(map[string]*State), nil, nil, set.InitSet(), 1}
 }
 
 func (a *Automaton) addState(s *State) {
@@ -58,6 +57,62 @@ func (a *Automaton) transition(char byte) bool {
 	return false
 }
 
+func max(x int, y int) int {
+	if x > y {
+		return x
+	} else {
+		return y
+	}
+}
+
+func pair(x int, y int) int {
+	if x == max(x, y) {
+		return x * x + x + y
+	} else {
+		return y * y + x
+	}
+}
+
+func unpair(z int) (int, int) {
+	floatZ := float64(z)
+
+	floorSqrt := math.Floor(math.Sqrt(floatZ))
+	if floatZ - math.Pow(floorSqrt, 2) < floorSqrt {
+		return int(floatZ - math.Pow(floorSqrt, 2)), int(floorSqrt)
+	} else {
+		return int(floorSqrt), int(floatZ - math.Pow(floorSqrt, 2) - floorSqrt)
+	}
+}
+
+func stoi(input string) int {
+	num := 0
+
+	for i := 0; i < len(input); i++ {
+		num *= 10
+		num += int(input[i] - 48)
+	}
+
+	return num
+}
+
+func pairN(nums []string, n int) int {
+	if len(nums) == 1 {
+		return stoi(nums[0])
+	}
+
+	z := pair(stoi(nums[0]), stoi(nums[1]))
+
+	for i := 2; i < n; i++ {
+		if i >= len(nums) {
+			z = pair(z, 0)
+		} else {
+			z = pair(z, stoi(nums[i]))
+		}
+	}
+
+	return z;
+}
+
 func (a *Automaton) closureOfOn(state *State, input string) *State {
 	newComposites := set.InitSet()
 	terminates    := false
@@ -85,13 +140,17 @@ func (a *Automaton) closureOfOn(state *State, input string) *State {
 		}
 	}
 
+	if newComposites.IsEmpty() {
+		return nil
+	}
+
 	for newComposite := range newComposites {
 		if a.getState(newComposite).terminates {
 			terminates = true
 		}
 	}
 
-	newState := initDFAState(newComposites)
+	newState := initDFAState(newComposites, itos(pairN(newComposites.ToSlice(), len(a.states))))
 
 	if terminates {
 		newState.setTerminates()
@@ -120,7 +179,8 @@ func (a *Automaton) determinize() *Automaton {
 
 		for input := range a.inputs {
 			newState := a.closureOfOn(dfa.getState(currentState), input)
-			if newState.name == "{}" {
+
+			if newState == nil {
 				continue
 			}
 

@@ -337,6 +337,22 @@ func (s Set) IsEmpty() bool {
 	}
 }
 
+func (s Set) ToSlice() []string {
+	slice := []string{}
+
+	for {
+		element, ok := s.Pop()
+
+		if !ok {
+			break
+		}
+
+		slice = append(slice, element)
+	}
+
+	return slice
+}
+
 /* Set.Print()
 /*
 /* Prints out the set's elements.

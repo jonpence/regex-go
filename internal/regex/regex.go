@@ -11,7 +11,7 @@ func initRegex(parser *Parser) Regex {
 	return Regex{"", false, initAutomaton(), parser}
 }
 
-func newRegex(input string, parser *Parser) (Regex, bool) {
+func NewRegex(input string, parser *Parser) (Regex, bool) {
 	r := initRegex(parser)
 
 	r.setExpression(input)
@@ -28,6 +28,10 @@ func (r *Regex) setExpression(expression string) {
 	r.compiled = false
 }
 
+func (r *Regex) Expression() string {
+	return r.expression
+}
+
 func (r *Regex) setAutomaton(dfa *Automaton) {
 	r.dfa = dfa
 }
@@ -38,15 +42,23 @@ func (r *Regex) compile() bool {
 	}
 
 	r.dfa = r.parser.nfa.determinize()
+
+	for state := range r.dfa.states {
+		r.dfa.getState(state).printDFAState()
+	}
+
 	r.compiled = true
 
 	return true
 }
 
-func (r Regex) validate(input string) bool {
-	if r.compiled {
-		return r.dfa.validate(input)
-	} else {
-		return false
+func (r Regex) Validate(input string) bool {
+	if !r.compiled {
+		ok := r.compile()
+		if !ok {
+			return false
+		}
 	}
+
+	return r.dfa.validate(input)
 }
