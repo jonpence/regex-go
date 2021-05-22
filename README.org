@@ -1,16 +1,22 @@
 #+TITLE: go-regex
 
-STATUS: broken af
+*STATUS:* broken af
 
-A regular expressions engine written in Go.
+A regular expressions engine written in Go. Currently working on naming DFA states using integers formed using an n-tuple pairing function. This should alleviate some
+difficulty in recognizing unique DFA states (which are just sets of NFA states), as well as enable faster computation in general.
 
 ** TO-DO
 1. [X] Fix Makefile.
-2. Unit test: [100%]
+2. [ ] Implement naming of DFA states using n-tuple pairing function. [0%]
+   a. [ ] Refactor Set to hold int instead of string.
+   b. [ ] Refactor Deque to hold int instead of string.
+   c. [ ] Refactor Automaton to recognize states by int id's instead of string names.
+   d. [ ] Remove usages of itos(), stoi().
+   e. [ ] Implement naming of DFA states using the generalized pairing function on n-tuples.
+3. Unit test: [33%]
    * [X] parser
-   * [X] automaton
-   * [X] regex
-3. [ ] Implement naming of DFA states using n-tuple pairing function.
+   * [ ] automaton
+   * [ ] regex
 4. [ ] Test exhaustively with long regular expressions and edge case regular expressions.
 5. [ ] Refactor and clean up code.
 6. [ ] Comment code.
