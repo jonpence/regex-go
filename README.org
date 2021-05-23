@@ -9,6 +9,7 @@ A regular expressions engine written in Go.
    * [X] automaton
    * [X] regex
 3. [ ] Test exhaustively with long regular expressions and edge case regular expressions.
+   * Fix concatenation!
 4. [ ] Refactor and clean up code.
 5. [ ] Comment code.
 6. [ ] Improve terminal user interface.
