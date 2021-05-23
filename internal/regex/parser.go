@@ -7,7 +7,7 @@ package regex
 
 import (
 	"fmt"
-	"github.com/jonpence/regex-go/internal/set"
+	"github.com/jonpence/regex-go/internal/iset"
 )
 
 type Parser struct {
@@ -143,10 +143,10 @@ func (p *Parser) parse(input string) bool {
 		}
 
 		// set terminating state
-		p.nfa.getState(itos(s_end)).setTerminates()
+		p.nfa.getState(s_end).setTerminates()
 
 		// set start
-		p.nfa.setStart(p.nfa.getState(itos(s_start)))
+		p.nfa.setStart(p.nfa.getState(s_start))
 
 		// TODO REMOVE
 		for state := range p.nfa.states {
@@ -444,34 +444,29 @@ func (p *Parser) or(startA int, startB int, endA int, endB int) (int, int) {
 
 	currentCount := p.nfa.getCount()
 
-	n0 := itos(currentCount)
-	n1 := itos(currentCount + 1)
-	n2 := itos(currentCount + 2)
-	n3 := itos(currentCount + 3)
+	ns0 := initNFAState(currentCount)
+	ns0.composites = iset.InitSetElements([]int{currentCount})
 
-	ns0 := initNFAState(n0)
-	ns0.composites = set.InitSetElements([]string{n0})
+	ns1 := initNFAState(currentCount + 1)
+	ns1.composites = iset.InitSetElements([]int{currentCount + 1})
 
-	ns1 := initNFAState(n1)
-	ns1.composites = set.InitSetElements([]string{n1})
+	ns2 := initNFAState(currentCount + 2)
+	ns2.composites = iset.InitSetElements([]int{currentCount + 2})
 
-	ns2 := initNFAState(n2)
-	ns2.composites = set.InitSetElements([]string{n2})
-
-	ns3 := initNFAState(n3)
-	ns3.composites = set.InitSetElements([]string{n3})
+	ns3 := initNFAState(currentCount + 3)
+	ns3.composites = iset.InitSetElements([]int{currentCount + 3})
 
 	p.nfa.addState(ns0)
 	p.nfa.addState(ns1)
 	p.nfa.addState(ns2)
 	p.nfa.addState(ns3)
 
-	p.nfa.addEdge(n0, n1, "")
-	p.nfa.addEdge(n2, n3, "")
-	p.nfa.addEdge(n1, itos(startA), "")
-	p.nfa.addEdge(n1, itos(startB), "")
-	p.nfa.addEdge(itos(endA), n2, "")
-	p.nfa.addEdge(itos(endB), n2, "")
+	p.nfa.addEdge(currentCount, currentCount + 1, "")
+	p.nfa.addEdge(currentCount + 2, currentCount + 3, "")
+	p.nfa.addEdge(currentCount + 1, startA, "")
+	p.nfa.addEdge(currentCount + 1, startB, "")
+	p.nfa.addEdge(endA, currentCount + 2, "")
+	p.nfa.addEdge(endB, currentCount + 2, "")
 
 	return currentCount, currentCount + 3
 }
@@ -484,7 +479,7 @@ func (p *Parser) concatenate(startA int, startB int, endA int, endB int) (int, i
 		fmt.Println("ADDING CONCATENATE")
 	}
 
-	p.nfa.addEdge(itos(endA), itos(startB), "")
+	p.nfa.addEdge(endA, startB, "")
 
 	return startA, endB
 }
@@ -498,22 +493,19 @@ func (p *Parser) kleene(startA int, endA int) (int, int) {
 	}
 	currentCount := p.nfa.getCount()
 
-	n0 := itos(currentCount)
-	n1 := itos(currentCount + 1)
+	ns0 := initNFAState(currentCount)
+	ns0.composites = iset.InitSetElements([]int{currentCount})
 
-	ns0 := initNFAState(n0)
-	ns0.composites = set.InitSetElements([]string{n0})
-
-	ns1 := initNFAState(n1)
-	ns1.composites = set.InitSetElements([]string{n1})
+	ns1 := initNFAState(currentCount + 1)
+	ns1.composites = iset.InitSetElements([]int{currentCount + 1})
 
 	p.nfa.addState(ns0)
 	p.nfa.addState(ns1)
 
-	p.nfa.addEdge(n0, n1, "")
-	p.nfa.addEdge(n0, itos(startA), "")
-	p.nfa.addEdge(itos(endA), n0, "")
-	p.nfa.addEdge(itos(endA), n1, "")
+	p.nfa.addEdge(currentCount, currentCount + 1, "")
+	p.nfa.addEdge(currentCount, startA, "")
+	p.nfa.addEdge(endA, currentCount, "")
+	p.nfa.addEdge(endA, currentCount + 1, "")
 
 	return currentCount , currentCount + 1
 }
@@ -527,20 +519,41 @@ func (p *Parser) symbol(symbol string) (int, int) {
 	}
 	currentCount := p.nfa.getCount()
 
-	n0 := itos(currentCount)
-	n1 := itos(currentCount + 1)
+	ns0 := initNFAState(currentCount)
+	ns0.composites = iset.InitSetElements([]int{currentCount})
 
-	ns0 := initNFAState(n0)
-	ns0.composites = set.InitSetElements([]string{n0})
-
-	ns1 := initNFAState(n1)
-	ns1.composites = set.InitSetElements([]string{n1})
+	ns1 := initNFAState(currentCount + 1)
+	ns1.composites = iset.InitSetElements([]int{currentCount + 1})
 
 	p.nfa.addState(ns0)
 	p.nfa.addState(ns1)
 
-	p.nfa.addEdge(n0, n1, symbol)
+	p.nfa.addEdge(currentCount, currentCount + 1, symbol)
 	p.nfa.inputs.Add(symbol)
 
 	return currentCount, currentCount + 1
+}
+
+
+func (p *Parser) plus(startA int, endA int) (int, int) {
+	if p.debug {
+		fmt.Println("ADDING PLUS")
+	}
+	currentCount := p.nfa.getCount()
+
+	ns0 := initNFAState(currentCount)
+	ns0.composites = iset.InitSetElements([]int{currentCount})
+
+	ns1 := initNFAState(currentCount + 1)
+	ns1.composites = iset.InitSetElements([]int{currentCount + 1})
+
+	p.nfa.addState(ns0)
+	p.nfa.addState(ns1)
+
+	p.nfa.addEdge(currentCount, currentCount + 1, "")
+	p.nfa.addEdge(currentCount, startA, "")
+	p.nfa.addEdge(endA, currentCount, "")
+	p.nfa.addEdge(endA, currentCount + 1, "")
+
+	return currentCount , currentCount + 1
 }

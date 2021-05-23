@@ -2,7 +2,7 @@ package regex
 
 import (
 	"fmt"
-	"github.com/jonpence/regex-go/internal/set"
+	"github.com/jonpence/regex-go/internal/iset"
 )
 
 // STATE METHODS
@@ -16,22 +16,22 @@ import (
 // printState
 
 type State struct {
-	name           string
-	neighbors      map[string][]string
-	composites     set.Set
+	id             int
+	neighbors      map[string][]int
+	composites     iset.Set
 	terminates     bool
 	dfaState       bool
 }
 
-func initNFAState(name string) *State {
-	return &State{name, make(map[string][]string), set.InitSet(), false, false}
+func initNFAState(id int) *State {
+	return &State{id, make(map[string][]int), iset.InitSet(), false, false}
 }
 
-func initDFAState(composites set.Set, name string) *State {
-	return &State{name, make(map[string][]string), composites, false, true}
+func initDFAState(composites iset.Set, id int) *State {
+	return &State{id, make(map[string][]int), composites, false, true}
 }
 
-func (s *State) addNeighbor(dest string, input string) {
+func (s *State) addNeighbor(dest int, input string) {
 	if !s.dfaState || len(s.neighbors[input]) == 0 {
 		s.neighbors[input] = append(s.neighbors[input], dest)
 	} else {
@@ -47,7 +47,7 @@ func (s *State) unsetTerminates() {
 	s.terminates = false
 }
 
-func (s State) getNeighborList(input string) ([]string, bool) {
+func (s State) getNeighborList(input string) ([]int, bool) {
 	neighborList, present := s.neighbors[input]
 
 	if present {
@@ -57,22 +57,21 @@ func (s State) getNeighborList(input string) ([]string, bool) {
 	}
 }
 
-func (s State) getNeighbor(input string) (string, bool) {
+func (s State) getNeighbor(input string) (int, bool) {
 	neighborList, present := s.getNeighborList(input)
 
 	if present {
-
 		return neighborList[0], true
 	} else {
-		return "", false
+	return 0, false
 	}
 }
 
 func (s State) printNFAState() {
 	if s.terminates {
-		fmt.Printf("%s*", s.name)
+		fmt.Printf("%d*", s.id)
 	} else {
-		fmt.Printf("%s", s.name)
+		fmt.Printf("%d", s.id)
 	}
 	if len(s.neighbors) == 0 {
 		fmt.Print("\tEMPTY\n")
@@ -86,24 +85,24 @@ func (s State) printNFAState() {
 			}
 			fmt.Print(" -> ")
 			for i := 0; i < len(s.neighbors[symbol]) - 1; i++ {
-				fmt.Printf("%s, ", s.neighbors[symbol][i])
+				fmt.Printf("%d, ", s.neighbors[symbol][i])
 			}
-			fmt.Printf("%s]\n", s.neighbors[symbol][len(s.neighbors[symbol]) - 1])
+			fmt.Printf("%d]\n", s.neighbors[symbol][len(s.neighbors[symbol]) - 1])
 		}
 	}
 }
 
 func (s State) printDFAState() {
 	if s.terminates {
-		fmt.Printf("%s*\n", s.name)
+		fmt.Printf("%d*\n", s.id)
 	} else {
-		fmt.Printf("%s\n", s.name)
+		fmt.Printf("%d\n", s.id)
 	}
 	if len(s.neighbors) == 0 {
 		fmt.Print("\tEMPTY\n")
 	} else {
 		for symbol := range s.neighbors {
-			fmt.Printf("\t[%s -> %s]\n", symbol, s.neighbors[symbol][0])
+			fmt.Printf("\t[%s -> %d]\n", symbol, s.neighbors[symbol][0])
 		}
 	}
 }

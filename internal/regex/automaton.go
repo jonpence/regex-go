@@ -1,12 +1,12 @@
 package regex
 
 import (
-	"math"
+	"github.com/jonpence/regex-go/internal/iset"
 	"github.com/jonpence/regex-go/internal/set"
-	"github.com/jonpence/regex-go/internal/deque")
+	"github.com/jonpence/regex-go/internal/ideque")
 
 type Automaton struct {
-	states  map[string]*State
+	states  map[int]*State
 	start   *State
 	current *State
 	inputs  set.Set
@@ -14,15 +14,15 @@ type Automaton struct {
 }
 
 func initAutomaton() *Automaton {
-	return &Automaton{make(map[string]*State), nil, nil, set.InitSet(), 1}
+	return &Automaton{make(map[int]*State), nil, nil, set.InitSet(), 1}
 }
 
 func (a *Automaton) addState(s *State) {
-	a.states[s.name] = s
+	a.states[s.id] = s
 	a.count += 1
 }
 
-func (a *Automaton) addEdge(src string, dest string, input string) {
+func (a *Automaton) addEdge(src int, dest int, input string) {
 	a.states[src].addNeighbor(dest, input)
 }
 
@@ -34,8 +34,8 @@ func (a *Automaton) setCurrent(s *State) {
 	a.current = s
 }
 
-func (a Automaton) getState(input string) *State {
-	return a.states[input]
+func (a Automaton) getState(num int) *State {
+	return a.states[num]
 }
 
 func (a Automaton) getCount() int {
@@ -57,64 +57,8 @@ func (a *Automaton) transition(char byte) bool {
 	return false
 }
 
-func max(x int, y int) int {
-	if x > y {
-		return x
-	} else {
-		return y
-	}
-}
-
-func pair(x int, y int) int {
-	if x == max(x, y) {
-		return x * x + x + y
-	} else {
-		return y * y + x
-	}
-}
-
-func unpair(z int) (int, int) {
-	floatZ := float64(z)
-
-	floorSqrt := math.Floor(math.Sqrt(floatZ))
-	if floatZ - math.Pow(floorSqrt, 2) < floorSqrt {
-		return int(floatZ - math.Pow(floorSqrt, 2)), int(floorSqrt)
-	} else {
-		return int(floorSqrt), int(floatZ - math.Pow(floorSqrt, 2) - floorSqrt)
-	}
-}
-
-func stoi(input string) int {
-	num := 0
-
-	for i := 0; i < len(input); i++ {
-		num *= 10
-		num += int(input[i] - 48)
-	}
-
-	return num
-}
-
-func pairN(nums []string, n int) int {
-	if len(nums) == 1 {
-		return stoi(nums[0])
-	}
-
-	z := pair(stoi(nums[0]), stoi(nums[1]))
-
-	for i := 2; i < n; i++ {
-		if i >= len(nums) {
-			z = pair(z, 0)
-		} else {
-			z = pair(z, stoi(nums[i]))
-		}
-	}
-
-	return z;
-}
-
 func (a *Automaton) closureOfOn(state *State, input string) *State {
-	newComposites := set.InitSet()
+	newComposites := iset.InitSet()
 	terminates    := false
 
 	// initialize composites with all reachable states from state on input
@@ -150,7 +94,8 @@ func (a *Automaton) closureOfOn(state *State, input string) *State {
 		}
 	}
 
-	newState := initDFAState(newComposites, itos(pairN(newComposites.ToSlice(), len(a.states))))
+	newState := initDFAState(newComposites, a.count)
+	a.count += 1
 
 	if terminates {
 		newState.setTerminates()
@@ -161,16 +106,17 @@ func (a *Automaton) closureOfOn(state *State, input string) *State {
 
 func (a *Automaton) determinize() *Automaton {
 	dfa   := initAutomaton()
-	queue := deque.InitQueue()
+	queue := ideque.InitQueue()
 
 	initialState := a.closureOfOn(a.start, "")
 
 	dfa.addState(initialState)
 	dfa.setStart(initialState)
 
-	queue.Enqueue(initialState.name)
+	queue.Enqueue(initialState.id)
 
 	for {
+		present := false
 		currentState, ok := queue.Dequeue()
 
 		if !ok {
@@ -184,12 +130,21 @@ func (a *Automaton) determinize() *Automaton {
 				continue
 			}
 
-			if _, present := dfa.states[newState.name]; !present {
-				dfa.addState(newState)
-				queue.Enqueue(newState.name)
+			// TODO Perhaps find a way to optimize this
+			for state := range dfa.states {
+				if dfa.states[state].composites.Equivalent(newState.composites) {
+					present = true
+					newState = dfa.states[state]
+					break
+				}
 			}
 
-			dfa.addEdge(currentState, newState.name, input)
+			if !present {
+				dfa.addState(newState)
+				queue.Enqueue(newState.id)
+			}
+
+			dfa.addEdge(currentState, newState.id, input)
 		}
 	}
 

@@ -3,6 +3,7 @@
 
 package regex
 
+/*
 import (
 	"testing"
 	"github.com/jonpence/regex-go/internal/set"
@@ -112,3 +113,4 @@ func TestGetNeighbor(t *testing.T) {
 		t.Errorf("expected neighbor to equal \"0\"")
 	}
 }
+*/

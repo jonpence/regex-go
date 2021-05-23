@@ -9,8 +9,7 @@ import (
 
 func main() {
 
-	p := initProgram()
-	p.run()
+	initProgram().run()
 
 	fmt.Println("Exiting...")
 }
