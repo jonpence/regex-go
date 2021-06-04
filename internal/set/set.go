@@ -13,6 +13,7 @@ type Set map[string]bool
 
 /* METHODS */
 //  -- InitSet() -> Set
+//  -- InitSetSize() -> Set
 //  -- InitSetElements([]string) -> Set
 //  -- Set.size() -> int
 //  -- itos(int) -> string
@@ -44,22 +45,21 @@ type Set map[string]bool
 
 /* InitSet() -> Set
 /*
-/* Instantiates a new map[string]bool and returns it cast to a Set.
+/* Instantiates a new []string and returns it cast to a Set.
  */
 func InitSet() Set {
-	return Set(make(map[string]bool))
+	return Set(make(map[string]bool, 0))
 }
 
 /* InitSetElements([]string) -> Set
 /*
-/* Instantiates a new map[string]bool and initializes its elements with */
-/* the string slice parameter. Then returns it cast to a Set.
+/* Casts parameter as a set.
  */
 func InitSetElements(elements []string) Set {
 	newSet := InitSet()
 
-	for _, element := range elements {
-		newSet.Add(element)
+	for _, elmt := range elements {
+		newSet.Add(elmt)
 	}
 
 	return newSet

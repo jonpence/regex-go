@@ -3,7 +3,9 @@ package regex
 import (
 	"github.com/jonpence/regex-go/internal/iset"
 	"github.com/jonpence/regex-go/internal/set"
-	"github.com/jonpence/regex-go/internal/ideque")
+	"github.com/jonpence/regex-go/internal/ideque"
+	"fmt"
+)
 
 type Automaton struct {
 	states  map[int]*State
@@ -61,22 +63,27 @@ func (a *Automaton) closureOfOn(state *State, input string) *State {
 	newComposites := iset.InitSet()
 	terminates    := false
 
+
 	// initialize composites with all reachable states from state on input
-	for composite := range state.composites {
+	for _, composite := range state.composites {
 		neighbors, _ := a.getState(composite).getNeighborList(input)
 		newComposites.Multiadd(neighbors)
 	}
 
+	fmt.Println("TEST TWO")
 	// reach all nil-reachable states
 	addedNew := true
 	for addedNew == true {
 		addedNew = false
 
-		for newComposite := range newComposites {
+		for _, newComposite := range newComposites {
+			fmt.Println("TEST TWO A")
 			nullReachable, _ := a.getState(newComposite).getNeighborList("")
 
 			for _, nullReached := range nullReachable {
+				fmt.Println("TEST TWO B")
 				if !newComposites.IsMember(nullReached) {
+					fmt.Println("TEST TWO C")
 					addedNew = true
 					newComposites.Add(nullReached)
 				}
@@ -84,11 +91,13 @@ func (a *Automaton) closureOfOn(state *State, input string) *State {
 		}
 	}
 
+	fmt.Println("TEST THREE")
 	if newComposites.IsEmpty() {
 		return nil
 	}
 
-	for newComposite := range newComposites {
+	fmt.Println("TEST FOUR")
+	for _, newComposite := range newComposites {
 		if a.getState(newComposite).terminates {
 			terminates = true
 		}

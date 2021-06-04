@@ -9,7 +9,7 @@ import (
 	"fmt"
 )
 
-type Set map[int]bool
+type Set List
 
 /* METHODS */
 //  -- InitSet() -> Set
@@ -35,7 +35,6 @@ type Set map[int]bool
 //  -- Set.Union(Set) -> Set
 //  -- Set.SymmetricDifference(Set) -> Set
 //  -- Set.Disjoint(Set) -> bool
-//  -- Set.Print()
 //  -- Set.ToString() -> string
 
 
@@ -43,72 +42,66 @@ type Set map[int]bool
 
 
 /* InitSet() -> Set
-/*
-/* Instantiates a new map[int]bool and returns it cast to a Set.
  */
 func InitSet() Set {
-	return Set(make(map[int]bool))
+	return Set(initList(0))
 }
 
 /* InitSetElements([]int) -> Set
-/*
-/* Instantiates a new map[int]bool and initializes its elements with */
-/* the string slice parameter. Then returns it cast to a Set.
  */
 func InitSetElements(elements []int) Set {
 	newSet := InitSet()
 
-	for _, element := range elements {
-		newSet.Add(element)
+	for _, elmt := range elements {
+		newSet.Add(elmt)
+		fmt.Println(newSet.ToString())
 	}
 
 	return newSet
 }
 
-/* Set.size() -> int
-/*
-/* Returns the number of elements in the set.
- */
-func (s Set) Size() int {
-	return len(s)
-}
-
 /* InitSetRange(int, int) -> Set
-/*
-/* Instantiates a new set and fills it with elements ranging from low to high
-/* exclusive. Then returns the new set.
  */
 func InitSetRange(lower int, upper int) Set {
 	newSet := InitSet()
 
-	for ; lower < upper; lower++ {
+	for ; lower < upper ; lower++ {
 		newSet.Add(lower)
 	}
 
 	return newSet
 }
 
+/* Set.size() -> int
+ */
+func (s Set) Size() int {
+	return List(s).size()
+}
+
 /* Set.IsMember(int) -> bool
-/*
-/* Returns true if int parameter is a member of the set.
  */
 func (s Set) IsMember(num int) bool {
-	present, member := s[num]
+	present, _ := List(s).search(num)
 
-	return present && member
+	return present
 }
 
 /* *Set.Add(int)
-/*
-/* Adds string parameter as member of the set.
  */
 func (s *Set) Add(num int) {
-	(*s)[num] = true
+	for i := 0; i < s.Size(); i++ {
+		if num == (*s)[i] {
+			return
+		} else if num < (*s)[i] {
+			(*List)(s).insert(num, i)
+			return
+		}
+	}
+
+	(*List)(s).append(num)
 }
 
 /* *Set.Multiadd([]int)
-/*
-/* Adds all members of []int parameter as members of the set.
  */
 func (s *Set) Multiadd(nums []int) {
 	for _, num := range nums {
@@ -117,92 +110,68 @@ func (s *Set) Multiadd(nums []int) {
 }
 
 /* *Set.Remove(int) -> bool
-/*
-/* If int parameter is a member of the set, Remove it and return true.
-/* Otherwise return false if int parameter is not a member.
  */
 func (s *Set) Remove(num int) bool {
-	if s.IsMember(num) {
-		(*s)[num] = false
-		return true
-	} else {
+	if !s.IsMember(num) {
 		return false
 	}
+
+	present, index := List(*s).search(num)
+
+	if !present {
+		return false
+	}
+
+	(*List)(s).remove(index)
+
+	return true
 }
 
 /* *Set.Discard(int)
-/*
-/* Remove int parameter from set and do not report if the int parameter
-/* was not detected as an element of the set.
  */
 func (s *Set) Discard(num int) {
-	if s.IsMember(num) {
-		(*s)[num] = false
-	}
+	s.Remove(num)
 }
 
 /* *Set.Pop() -> (int, bool)
-/*
-/* Remove a random element from the set and return it and return true. If the
-/* set is empty, return 0 and report false.
  */
 func (s *Set) Pop() (int, bool) {
-	for element := range *s {
-		if s.IsMember(element) {
-			s.Remove(element)
-			return element, true
-		}
+	if s.IsEmpty() {
+		return 0, false
 	}
 
-	return 0, false
+	elmt := (*s)[0]
+
+	s.Discard(elmt)
+
+	return elmt, true
 }
 
 /* *Set.Clear()
-/*
-/* Removes all elements from the set.
  */
 func (s *Set) Clear() {
-	for element := range *s {
-		s.Remove(element)
+	for !s.IsEmpty() {
+		s.Pop()
 	}
 }
 
 /* Set.Copy() -> Set
-/*
-/* Returns a Copy of the set.
  */
 func (s Set) Copy() Set {
-	newSet := InitSet()
+	elements := []int{}
+	copy(elements, s)
 
-	for element := range s {
-		if s.IsMember(element) {
-			newSet.Add(element)
-		}
-	}
-
-	return newSet
+	return InitSetElements(elements)
 }
 
 /* Set.Intersection(Set) -> Set
-/*
-/* Returns the Intersection of the sets.
  */
 func (setA Set) Intersection(setB Set) Set {
-	var larger, smaller *Set
-
 	newSet := InitSet()
 
-	if setA.Size() > setB.Size() {
-		larger = &setA
-		smaller = &setB
-	} else {
-		larger = &setB
-		smaller = &setA
-	}
-
-	for element := range *larger {
-		if larger.IsMember(element) && smaller.IsMember(element) {
-			newSet.Add(element)
+	for _, elmt := range setA {
+		if setB.IsMember(elmt) {
+			newSet.Add(elmt)
 		}
 	}
 
@@ -210,12 +179,10 @@ func (setA Set) Intersection(setB Set) Set {
 }
 
 /* Set.Subset(Set) -> bool
-/*
-/* Returns true if the set is a Subset of the other set.
  */
 func (setA Set) Subset(setB Set) bool {
-	for element := range setA {
-		if setA.IsMember(element) && !setB.IsMember(element) {
+	for _, elmt := range setA {
+		if !setB.IsMember(elmt) {
 			return false
 		}
 	}
@@ -224,48 +191,38 @@ func (setA Set) Subset(setB Set) bool {
 }
 
 /* Set.Superset(Set) -> bool
-/*
-/* Returns true if the set is a Superset of the other set.
  */
 func (setA Set) Superset(setB Set) bool {
 	return setB.Subset(setA)
 }
 
 /* Set.ProperSubset(Set) -> bool
-/*
-/* Returns true if the set is a Proper Subset of the other set.
  */
 func (setA Set) ProperSubset(setB Set) bool {
 	return setA.Subset(setB) && !setB.Subset(setA)
 }
 
 /* Set.ProperSuperset(Set) -> bool
-/*
-/* Returns true if the set is a Proper Superset of the other set.
  */
 func (setA Set) ProperSuperset(setB Set) bool {
 	return setA.Superset(setB) && !setB.Superset(setA)
 }
 
 /* Set.Equivalent(Set) -> bool
-/*
-/* Returns true if the set is Equivalent with the other set.
  */
 func (setA Set) Equivalent(setB Set) bool {
 	return setA.Subset(setB) && setB.Subset(setA)
 }
 
 /* Set.Difference(Set) -> Set
-/*
-/* Returns the Difference between the set and the other set.
  */
 func (setA Set) Difference(setB Set) Set {
-	newSet := InitSet()
-	Intersection := setA.Intersection(setB)
+	intersection := setA.Intersection(setB)
+	newSet       := InitSet()
 
-	for element := range setA {
-		if setA.IsMember(element) && !Intersection.IsMember(element) {
-			newSet.Add(element)
+	for _, elmt := range setA {
+		if !intersection.IsMember(elmt) {
+			newSet.Add(elmt)
 		}
 	}
 
@@ -273,107 +230,41 @@ func (setA Set) Difference(setB Set) Set {
 }
 
 /* Set.Union(Set) -> Set
-/*
-/* Returns the Union of the set with the other set.
  */
 func (setA Set) Union(setB Set) Set {
 	newSet := InitSet()
 
-	for element := range setA {
-		if setA.IsMember(element) {
-			newSet.Add(element)
-		}
+	for _, elmt := range setA {
+		newSet.Add(elmt)
 	}
 
-	for element := range setB {
-		if setB.IsMember(element) {
-			newSet.Add(element)
-		}
+	for _, elmt := range setB {
+		newSet.Add(elmt)
 	}
 
 	return newSet
 }
 
 /* Set.SymmetricDifference(Set) -> Set
-/*
-/* Returns the Difference of the Union of the set and the other set with the */
-/* Intersection of the set and the other set.
  */
 func (setA Set) SymmetricDifference(setB Set) Set {
 	return setA.Union(setB).Difference(setA.Intersection(setB))
 }
 
 /* Set.Disjoint(Set) -> bool
-/*
-/* Returns true if the set is Disjoint with the other set.
  */
 func (setA Set) Disjoint(setB Set) bool {
 	return setA.Intersection(setB).IsEmpty()
 }
 
 /* Set.IsEmpty() -> bool
-/*
-/* Returns true if the set is empty.
  */
 func (s Set) IsEmpty() bool {
-	if len(s) == 0 {
-		return true
-	} else {
-		for element := range s {
-			if s.IsMember(element) {
-				return false
-			}
-		}
-
-		return true
-	}
-}
-
-func (s Set) ToSlice() []int {
-	slice := []int{}
-
-	for {
-		element, ok := s.Pop()
-
-		if !ok {
-			break
-		}
-
-		slice = append(slice, element)
-	}
-
-	return slice
-}
-
-/* Set.Print()
-/*
-/* Prints out the set's elements.
- */
-func (s Set) Print() {
-	fmt.Println(s.ToString())
+	return len(s) == 0
 }
 
 /* Set.ToString() -> string
-/*
-/* Returns a string of the set's elements.
  */
 func (s Set) ToString() string {
-	var buf string
-	buf = buf + "{"
-
-	first := true
-
-	for element := range s {
-		if s.IsMember(element) {
-			if !first {
-				buf = buf + fmt.Sprintf(", %d", element)
-			} else {
-				buf = buf + fmt.Sprintf("%d", element)
-				first = false
-			}
-		}
-	}
-	buf = buf + "}"
-
-	return buf
+	return List(s).toString()
 }
