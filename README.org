@@ -2,23 +2,6 @@
 
 A regular expressions engine written in Go.
 
-** TO-DO
-1. [X] Fix Makefile.
-2. Unit test: [100%]
-   * [X] parser
-   * [X] automaton
-   * [X] regex
-3. [ ] Test exhaustively with long regular expressions and edge case regular expressions.
-   * Fix concatenation!
-4. [ ] Refactor and clean up code.
-5. [ ] Comment code.
-6. [ ] Improve terminal user interface.
-7. [ ] Document usage/implementation details/motivation in README.
-8. Add support for '+' and '?' operators. [0%]
-   * [ ] Rewrite parser.go functions such that their names correspond to the grammar's non-terminals.
-   * [ ] Implement functions for the plus, question non-terminals.
-9. [ ] Add implicit concatenation (i.e. remove need for explicit concatenation operator in regular expression).
-
 ** Usage
 
 *** How to Build
